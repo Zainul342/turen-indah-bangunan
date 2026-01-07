@@ -58,6 +58,13 @@ export async function POST(request: NextRequest) {
         }
 
         const orderDoc = snapshot.docs[0];
+        if (!orderDoc) {
+            console.error('Order document not found:', payload.order_id);
+            return NextResponse.json(
+                { success: false, message: 'Order not found' },
+                { status: 404 }
+            );
+        }
         const orderId = orderDoc.id;
         const orderData = orderDoc.data();
 
