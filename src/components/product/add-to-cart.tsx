@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner"; // Assuming sonner is installed, or we use a simple alert/console for MVP
 
 interface AddToCartProps {

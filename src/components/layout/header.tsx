@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { SearchBar } from "./search-bar";
-import { ShoppingCart, LogIn, Search } from "lucide-react";
+import { ShoppingCart, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
