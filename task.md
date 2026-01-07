@@ -175,8 +175,8 @@
   - [ ] Implement proper Error Handling (Return meta error codes, don't swallow errors)
   - [ ] Remove `courier` hardcoding (Use dynamic config/env)
   - [ ] Resolve Logic Overlap (Clarify Fleet vs Expedition priority)
-- [ ] **Cart Sync Logic Verification**
-  - [ ] Verify/Implement proper conflict resolution for Cart Merge
+- [x] **Cart Sync Logic Verification**
+  - [x] Verify/Implement proper conflict resolution for Cart Merge
 
 #### 4.2 Project Setup (✅ Completed)
 
@@ -214,8 +214,8 @@
 #### 4.4 Frontend Development
 
 - [x] Component library setup (Shadcn UI components)
-- [ ] Layout components (Header, Footer, Sidebar)
-- [ ] Landing Page
+- [x] Layout components (Header, Footer, Sidebar)
+- [x] Landing Page
 - [ ] Product Catalog (with filters, search, sort)
 - [ ] Product Detail Page
 - [ ] Cart Page

@@ -7,7 +7,7 @@
  * @project Turen Indah Bangunan
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getAdminDb, getAdminAuth } from '@/lib/firebase/admin';
 import type { Cart, CartItem } from '@/types/cart';
@@ -16,7 +16,11 @@ import type { Cart, CartItem } from '@/types/cart';
 // GET Handler - Get user's cart
 // ============================================
 
-export async function GET(request: NextRequest) {
+// ============================================
+// GET Handler - Get user's cart
+// ============================================
+
+export async function GET() {
     try {
         // Get session from cookie
         const cookieStore = await cookies();
@@ -73,6 +77,7 @@ export async function GET(request: NextRequest) {
             data: cart,
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching cart:', error);
         return NextResponse.json(
             {

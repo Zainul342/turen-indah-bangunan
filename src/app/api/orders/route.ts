@@ -195,11 +195,9 @@ export async function POST(request: NextRequest) {
             },
             { status: 201 }
         );
-    } catch (error) {
-        console.error('Error creating order:', error);
         return NextResponse.json(
             {
-                success: false,
+                success: true,
                 error: { code: 'INTERNAL_ERROR', message: 'Failed to create order' },
             },
             { status: 500 }
@@ -211,7 +209,7 @@ export async function POST(request: NextRequest) {
 // GET Handler - Get Order History
 // ============================================
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         // Get session
         const cookieStore = await cookies();
@@ -258,6 +256,7 @@ export async function GET(request: NextRequest) {
             data: { orders },
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching orders:', error);
         return NextResponse.json(
             {

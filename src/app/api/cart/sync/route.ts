@@ -34,6 +34,10 @@ const syncCartSchema = z.object({
 // POST Handler - Sync cart to Firestore
 // ============================================
 
+// ============================================
+// POST Handler - Sync cart to Firestore
+// ============================================
+
 export async function POST(request: NextRequest) {
     try {
         // Get session from cookie
@@ -71,21 +75,58 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { items } = parseResult.data;
+        const { items: incomingItems } = parseResult.data;
         const sessionCookie = sessionToken;
         const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie, true);
         const userId = decodedClaims.uid;
         const db = getAdminDb();
 
-        // Calculate derived values
-        const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-        const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        // 1. Fetch existing cart
+        const cartRef = db.collection('carts').doc(userId);
+        const cartDoc = await cartRef.get();
+        let existingItems: CartItem[] = [];
 
-        // Update or create cart document
-        await db.collection('carts').doc(userId).set(
+        if (cartDoc.exists) {
+            const data = cartDoc.data();
+            existingItems = data?.items || [];
+        }
+
+        // 2. MERGE Logic
+        // Use a Map to track items by productId for O(1) lookup
+        const mergedItemsMap = new Map<string, CartItem>();
+
+        // Add existing items first
+        existingItems.forEach((item) => {
+            mergedItemsMap.set(item.productId, { ...item });
+        });
+
+        // Merge incoming items
+        incomingItems.forEach((incomingItem) => {
+            if (mergedItemsMap.has(incomingItem.productId)) {
+                // Item exists, sum quantity
+                const existingItem = mergedItemsMap.get(incomingItem.productId)!;
+                existingItem.quantity += incomingItem.quantity;
+                // Update price and image to latest from client (optional, but good for sync)
+                existingItem.price = incomingItem.price;
+                existingItem.productImage = incomingItem.productImage;
+                existingItem.productName = incomingItem.productName;
+            } else {
+                // New item, add to map
+                mergedItemsMap.set(incomingItem.productId, { ...incomingItem });
+            }
+        });
+
+        const mergedItems = Array.from(mergedItemsMap.values());
+
+        // 3. Recalculate Totals
+        const itemCount = mergedItems.reduce((sum, item) => sum + item.quantity, 0);
+        const subtotal = mergedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+        // 4. Save to Firestore
+        await cartRef.set(
             {
                 userId,
-                items,
+                items: mergedItems,
                 itemCount,
                 subtotal,
                 updatedAt: new Date(),
@@ -97,13 +138,14 @@ export async function POST(request: NextRequest) {
             success: true,
             message: 'Cart synced successfully',
             data: {
-                items,
+                items: mergedItems,
                 itemCount,
                 subtotal,
                 updatedAt: new Date().toISOString(),
             },
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error syncing cart:', error);
         return NextResponse.json(
             {
