@@ -79,7 +79,6 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ success: true, role });
     } catch (error) {
-        // eslint-disable-next-line no-console
         console.error('Session creation error:', error);
         return NextResponse.json(
             { error: 'Unauthorized' },
@@ -114,7 +113,7 @@ export async function GET() {
                 email: decodedClaims.email,
             },
         });
-    } catch {
+    } catch (error) {
         // Session verification failed (expired or invalid)
         return NextResponse.json({ authenticated: false }, { status: 200 });
     }
@@ -132,7 +131,7 @@ export async function DELETE() {
         try {
             const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie);
             await getAdminAuth().revokeRefreshTokens(decodedClaims.sub);
-        } catch {
+        } catch (error) {
             // Ignore error if cookie is invalid, just clear it
         }
     }

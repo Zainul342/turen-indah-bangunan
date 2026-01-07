@@ -176,7 +176,8 @@
   - [ ] Remove `courier` hardcoding (Use dynamic config/env)
   - [ ] Resolve Logic Overlap (Clarify Fleet vs Expedition priority)
 - [x] **Cart Sync Logic Verification**
-  - [x] Verify/Implement proper conflict resolution for Cart Merge
+  - [x] Implement Merge Strategy (Sum quantities, preserve existing) in `src/app/api/cart/sync/route.ts`
+  - [x] Verify merge correctness
 
 #### 4.2 Project Setup (✅ Completed)
 
@@ -214,8 +215,8 @@
 #### 4.4 Frontend Development
 
 - [x] Component library setup (Shadcn UI components)
-- [x] Layout components (Header, Footer, Sidebar)
-- [x] Landing Page
+- [ ] Layout components (Header, Footer, Sidebar)
+- [ ] Landing Page
 - [ ] Product Catalog (with filters, search, sort)
 - [ ] Product Detail Page
 - [ ] Cart Page

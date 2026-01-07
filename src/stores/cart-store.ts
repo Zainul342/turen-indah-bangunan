@@ -57,7 +57,7 @@ function calculateSubtotal(items: CartItem[]): number {
 
 export const useCartStore = create<CartState>()(
     persist(
-        (set, _get) => ({
+        (set, get) => ({
             // Initial state
             items: [],
             isLoading: false,

@@ -12,6 +12,7 @@ import { cookies } from 'next/headers';
 import { getAdminDb, getAdminAuth } from '@/lib/firebase/admin';
 import { z } from 'zod';
 import type { CartItem } from '@/types/cart';
+import { mergeCarts, calculateCartTotals } from '@/lib/cart-utils';
 
 // ============================================
 // Validation Schema
@@ -29,10 +30,6 @@ const cartItemSchema = z.object({
 const syncCartSchema = z.object({
     items: z.array(cartItemSchema),
 });
-
-// ============================================
-// POST Handler - Sync cart to Firestore
-// ============================================
 
 // ============================================
 // POST Handler - Sync cart to Firestore
@@ -75,58 +72,33 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { items: incomingItems } = parseResult.data;
+        const { items } = parseResult.data;
         const sessionCookie = sessionToken;
         const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie, true);
         const userId = decodedClaims.uid;
         const db = getAdminDb();
 
-        // 1. Fetch existing cart
-        const cartRef = db.collection('carts').doc(userId);
-        const cartDoc = await cartRef.get();
-        let existingItems: CartItem[] = [];
+        // 3. Fetch Existing Cart
+        const cartDocRef = db.collection('carts').doc(userId);
+        const cartDoc = await cartDocRef.get();
 
+        let existingItems: CartItem[] = [];
         if (cartDoc.exists) {
             const data = cartDoc.data();
-            existingItems = data?.items || [];
+            existingItems = (data?.items as CartItem[]) || [];
         }
 
-        // 2. MERGE Logic
-        // Use a Map to track items by productId for O(1) lookup
-        const mergedItemsMap = new Map<string, CartItem>();
+        // 4. Merge Logic
+        const finalItems = mergeCarts(existingItems, items);
 
-        // Add existing items first
-        existingItems.forEach((item) => {
-            mergedItemsMap.set(item.productId, { ...item });
-        });
+        // 5. Recalculate Totals
+        const { itemCount, subtotal } = calculateCartTotals(finalItems);
 
-        // Merge incoming items
-        incomingItems.forEach((incomingItem) => {
-            if (mergedItemsMap.has(incomingItem.productId)) {
-                // Item exists, sum quantity
-                const existingItem = mergedItemsMap.get(incomingItem.productId)!;
-                existingItem.quantity += incomingItem.quantity;
-                // Update price and image to latest from client (optional, but good for sync)
-                existingItem.price = incomingItem.price;
-                existingItem.productImage = incomingItem.productImage;
-                existingItem.productName = incomingItem.productName;
-            } else {
-                // New item, add to map
-                mergedItemsMap.set(incomingItem.productId, { ...incomingItem });
-            }
-        });
-
-        const mergedItems = Array.from(mergedItemsMap.values());
-
-        // 3. Recalculate Totals
-        const itemCount = mergedItems.reduce((sum, item) => sum + item.quantity, 0);
-        const subtotal = mergedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-        // 4. Save to Firestore
-        await cartRef.set(
+        // 6. Save Merged Cart
+        await cartDocRef.set(
             {
                 userId,
-                items: mergedItems,
+                items: finalItems,
                 itemCount,
                 subtotal,
                 updatedAt: new Date(),
@@ -136,16 +108,15 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
             success: true,
-            message: 'Cart synced successfully',
+            message: 'Cart sync merged successfully',
             data: {
-                items: mergedItems,
+                items: finalItems,
                 itemCount,
                 subtotal,
                 updatedAt: new Date().toISOString(),
             },
         });
     } catch (error) {
-        // eslint-disable-next-line no-console
         console.error('Error syncing cart:', error);
         return NextResponse.json(
             {

@@ -90,7 +90,6 @@ export async function POST(request: NextRequest) {
                     shippingOptions.push(...jneCosts);
                 }
             } catch (roError) {
-                // eslint-disable-next-line no-console
                 console.warn('RajaOngkir fetch failed:', roError);
                 // Don't fail the whole request, just return what we have (e.g. maybe just fleet)
             }
@@ -114,7 +113,6 @@ export async function POST(request: NextRequest) {
             data: shippingOptions,
         });
     } catch (error) {
-        // eslint-disable-next-line no-console
         console.error('Error calculating shipping:', error);
         return NextResponse.json(
             {
