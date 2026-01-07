@@ -15,7 +15,7 @@
 | **Phase 1: Discovery & Validation** | ✅ **Completed** | 100% |
 | **Phase 2: Documentation (PRD)** | ✅ **Completed** | 100% |
 | **Phase 3: Rancangan (Design & Architecture)** | ✅ **Completed** | 100% |
-| **Phase 4: Development** | 🔄 **In Progress** | 55% |
+| **Phase 4: Development** | 🔄 **In Progress** | 60% |
 | **Phase 5: Verification & Testing** | ⏳ Pending | 0% |
 | **Phase 6: Deployment** | ⏳ Pending | 0% |
 | **Phase 7: Iteration Loop** | ⏳ Pending | 0% |
@@ -160,11 +160,25 @@
 
 ---
 
-### Phase 4: Development (MVP) (⏳ Next)
+### Phase 4: Development (MVP) (🔄 In Progress)
 
-> **Approach:** Frontend-first dengan mock data → Replace dengan real API
+> **Approach:** Backend Hardening & Logic Correction (Prioritas Utama)
 
-#### 4.1 Project Setup (✅ Completed)
+#### 4.1 Security & Architecture Repairs (🔥 CRITICAL)
+
+- [ ] **Fix Auth Session Security**
+  - [ ] Audit `src/app/api/auth/session/route.ts` (Verify minting process)
+  - [ ] Implement `adminAuth.verifySessionCookie` in `src/app/api/cart/route.ts` & middleware
+  - [ ] Remove raw UID usage from cookies
+- [ ] **Fix Shipping API Logic & Safety**
+  - [ ] Remove `any` types in `shipping/cost/route.ts` -> Create strict interfaces
+  - [ ] Implement proper Error Handling (Return meta error codes, don't swallow errors)
+  - [ ] Remove `courier` hardcoding (Use dynamic config/env)
+  - [ ] Resolve Logic Overlap (Clarify Fleet vs Expedition priority)
+- [ ] **Cart Sync Logic Verification**
+  - [ ] Verify/Implement proper conflict resolution for Cart Merge
+
+#### 4.2 Project Setup (✅ Completed)
 
 - [x] Initialize Next.js 15 project (Manual setup)
 - [x] Setup Tailwind CSS + Config (TIB Red #D32F2F)
@@ -192,8 +206,8 @@
 - [x] Product API routes (`/api/products/*`)
 - [x] Cart management (sessionStorage + Firestore)
 - [x] Order creation & management
-- [/] Payment webhook (Midtrans callback)
-- [ ] Shipping estimation (RajaOngkir integration)
+- [x] Payment webhook (Midtrans callback)
+- [/] Shipping estimation (RajaOngkir + Custom Armada)
 
 #### 4.4 Frontend Development
 
