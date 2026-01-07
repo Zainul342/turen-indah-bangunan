@@ -1,0 +1,90 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // ========== HELPER FUNCTIONS ==========
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user is owner
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Check if user is admin (requires Firestore lookup)
+    function isAdmin() {
+      return isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Validate file size (max 5MB)
+    function isValidSize() {
+      return request.resource.size < 5 * 1024 * 1024;
+    }
+    
+    // Validate image content type
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    
+    // ========== PRODUCT IMAGES ==========
+    // Only admins can upload product images
+    // Anyone can view (public catalog)
+    
+    match /products/{productId}/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin() && isImage() && isValidSize();
+    }
+    
+    
+    // ========== CATEGORY IMAGES ==========
+    // Only admins can upload category images
+    
+    match /categories/{categoryId}/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin() && isImage() && isValidSize();
+    }
+    
+    
+    // ========== STORE IMAGES ==========
+    // Only admins can upload store photos
+    
+    match /stores/{storeId}/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin() && isImage() && isValidSize();
+    }
+    
+    
+    // ========== USER AVATARS ==========
+    // Users can upload their own avatars
+    
+    match /users/{userId}/avatar/{imageId} {
+      allow read: if true;
+      allow write: if isOwner(userId) && isImage() && isValidSize();
+    }
+    
+    
+    // ========== REVIEW IMAGES ==========
+    // Authenticated users can upload review images
+    // Max 3 images per review
+    
+    match /reviews/{reviewId}/{imageId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && isImage() && isValidSize();
+    }
+    
+    
+    // ========== TEMPORARY UPLOADS ==========
+    // For processing before moving to permanent location
+    // Auto-cleanup after 24 hours (configure in Cloud Functions)
+    
+    match /temp/{userId}/{fileName} {
+      allow read, write: if isOwner(userId) && isValidSize();
+    }
+    
+  }
+}

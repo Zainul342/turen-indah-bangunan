@@ -1,0 +1,116 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ========== HELPER FUNCTIONS ==========
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user is the owner of a document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Check if user has admin role
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Validate that required fields exist
+    function hasFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
+    
+    // ========== PUBLIC DATA ==========
+    // These collections can be read by anyone (guests, customers, admins)
+    
+    // Products - public read, admin write
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Categories - public read, admin write
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Stores - public read, admin write
+    match /stores/{storeId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Settings - public read, admin write
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Reviews - public read, auth create, owner update
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isOwner(resource.data.userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    
+    // ========== PROTECTED DATA ==========
+    // These collections have restricted access
+    
+    // Users - owner read/update, admin manage
+    match /users/{userId} {
+      // Users can read and update their own profile
+      allow read, update: if isOwner(userId);
+      
+      // Users can create their own profile after registration
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Only admin can delete users
+      allow delete: if isAdmin();
+    }
+    
+    // Carts - owner only (synced cart for logged-in users)
+    match /carts/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Orders - complex rules for guest checkout support
+    match /orders/{orderId} {
+      // Customer can read their own orders
+      // Admin can read all orders
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Anyone can create (supports guest checkout)
+      // Additional validation happens in API layer
+      allow create: if true;
+      
+      // Only admin can update order status
+      allow update: if isAdmin();
+      
+      // Orders should never be deleted (audit trail)
+      allow delete: if false;
+    }
+    
+    
+    // ========== ADMIN-ONLY DATA ==========
+    
+    // Inventory logs - admin only
+    match /inventory_logs/{logId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Admin dashboard stats - admin only
+    match /admin_stats/{statId} {
+      allow read, write: if isAdmin();
+    }
+    
+  }
+}
