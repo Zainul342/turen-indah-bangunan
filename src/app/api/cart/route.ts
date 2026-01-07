@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { getAdminDb } from '@/lib/firebase/admin';
+import { getAdminDb, getAdminAuth } from '@/lib/firebase/admin';
 import type { Cart, CartItem } from '@/types/cart';
 
 // ============================================
@@ -35,7 +35,9 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const userId = sessionToken;
+        const sessionCookie = sessionToken;
+        const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie, true);
+        const userId = decodedClaims.uid;
         const db = getAdminDb();
 
         // Get cart document

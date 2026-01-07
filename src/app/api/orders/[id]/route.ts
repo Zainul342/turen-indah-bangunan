@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { getAdminDb } from '@/lib/firebase/admin';
+import { getAdminDb, getAdminAuth } from '@/lib/firebase/admin';
 import type { Order } from '@/types/order';
 
 // ============================================
@@ -35,9 +35,9 @@ export async function GET(
 
         // Get session
         const cookieStore = await cookies();
-        const sessionToken = cookieStore.get('tib-session')?.value;
+        const sessionCookie = cookieStore.get('tib-session')?.value;
 
-        if (!sessionToken) {
+        if (!sessionCookie) {
             return NextResponse.json(
                 {
                     success: false,
@@ -47,7 +47,8 @@ export async function GET(
             );
         }
 
-        const userId = sessionToken;
+        const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie, true);
+        const userId = decodedClaims.uid;
         const db = getAdminDb();
 
         // Get order document

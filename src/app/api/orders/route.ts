@@ -10,7 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { getAdminDb } from '@/lib/firebase/admin';
+import { getAdminDb, getAdminAuth } from '@/lib/firebase/admin';
 import { createOrderSchema } from '@/schemas/order.schema';
 import type { Order, OrderItem, OrderListItem, StatusHistory } from '@/types/order';
 import type { CartItem } from '@/types/cart';
@@ -79,7 +79,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const userId = sessionToken;
+        const sessionCookie = sessionToken;
+        const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie, true);
+        const userId = decodedClaims.uid;
         const db = getAdminDb();
 
         // Parse and validate body
@@ -225,7 +227,9 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const userId = sessionToken;
+        const sessionCookie = sessionToken;
+        const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie, true);
+        const userId = decodedClaims.uid;
         const db = getAdminDb();
 
         // Get user's orders

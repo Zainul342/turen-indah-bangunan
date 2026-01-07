@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { getAdminDb } from '@/lib/firebase/admin';
+import { getAdminDb, getAdminAuth } from '@/lib/firebase/admin';
 import { z } from 'zod';
 import type { CartItem } from '@/types/cart';
 
@@ -72,7 +72,9 @@ export async function POST(request: NextRequest) {
         }
 
         const { items } = parseResult.data;
-        const userId = sessionToken;
+        const sessionCookie = sessionToken;
+        const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie, true);
+        const userId = decodedClaims.uid;
         const db = getAdminDb();
 
         // Calculate derived values

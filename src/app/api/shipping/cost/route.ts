@@ -2,6 +2,7 @@
  * Shipping Cost API
  * ==================
  * POST /api/shipping/cost - Calculate shipping cost (Hybrid)
+ * Hardened version with strict typing and error handling.
  *
  * @file src/app/api/shipping/cost/route.ts
  * @project Turen Indah Bangunan
@@ -16,6 +17,7 @@ import {
     isEligibleForExpedition,
 } from '@/lib/shipping-rules';
 import { z } from 'zod';
+import type { ShippingOption } from '@/types/shipping';
 
 // ============================================
 // Validation Schema
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
 
         const { destinationCityId, weight, subtotal } = parseResult.data;
         const originCityId = getOriginCityId();
-        const shippingOptions: any[] = [];
+        const shippingOptions: ShippingOption[] = [];
 
         // 1. Calculate Custom Fleet Rates (if in Malang Area)
         if (isMalangArea(destinationCityId)) {
@@ -65,11 +67,9 @@ export async function POST(request: NextRequest) {
         }
 
         // 2. Fetch RajaOngkir Rates (Hybrid strategy)
-        // Check eligibility first (weight limit)
         if (isEligibleForExpedition(weight)) {
             try {
-                // Use 'zne' (JNE) as representative courier, can loop ['jne', 'jnt', 'sicepat'] if needed
-                const courier = 'jne';
+                const courier = 'jne'; // Can be made dynamic from env or request
                 const rajaOngkirResults = await calculateRajaOngkirCost(
                     originCityId,
                     destinationCityId,
@@ -79,9 +79,9 @@ export async function POST(request: NextRequest) {
 
                 if (rajaOngkirResults.length > 0 && rajaOngkirResults[0]) {
                     const result = rajaOngkirResults[0];
-                    const jneCosts = result.costs.map((cost) => ({
-                        code: 'JNE',
-                        name: 'JNE',
+                    const jneCosts: ShippingOption[] = result.costs.map((cost) => ({
+                        code: result.code.toUpperCase(), // 'JNE'
+                        name: result.name,
                         service: cost.service,
                         description: cost.description,
                         cost: cost.cost[0]?.value || 0,
@@ -91,13 +91,18 @@ export async function POST(request: NextRequest) {
                 }
             } catch (roError) {
                 console.warn('RajaOngkir fetch failed:', roError);
+                // Don't fail the whole request, just return what we have (e.g. maybe just fleet)
             }
         }
 
-        // 3. Fallback / Warning used for Heavy Items outside Malang
+        // 3. Fallback for Empty Options (Heavy Item + Outside Malang)
         if (shippingOptions.length === 0) {
-            // If weight is heavy and not in Malang, return empty or specific instruction
-            // Frontend should handle empty options as "Contact Admin for Shipping"
+            // Return success but empty data, frontend explains why
+            return NextResponse.json({
+                success: true,
+                data: [],
+                message: 'No shipping options available (Item potentially too heavy for expedition)'
+            });
         }
 
         // 4. Sort by cheapest

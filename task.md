@@ -207,7 +207,9 @@
 - [x] Cart management (sessionStorage + Firestore)
 - [x] Order creation & management
 - [x] Payment webhook (Midtrans callback)
-- [/] Shipping estimation (RajaOngkir + Custom Armada)
+- [x] Shipping estimation (RajaOngkir + Custom Armada)
+- [/] **Hardening:** Secure Auth Session (Firebase Session Cookie)
+- [/] **Hardening:** Strict Shipping Types & Safety
 
 #### 4.4 Frontend Development
 

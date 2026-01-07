@@ -1,11 +1,12 @@
 /**
  * Session API Route
  * ==================
- * Manages authentication session cookies.
+ * Manages authentication session cookies using Firebase Admin SDK.
+ * Uses secure Session Cookies instead of raw UIDs.
  *
- * POST   - Create session (set cookie after login)
- * GET    - Verify session & return user info
- * DELETE - Clear session (logout)
+ * POST   - Create session cookie
+ * GET    - Verify session cookie
+ * DELETE - Revoke session
  *
  * @file src/app/api/auth/session/route.ts
  * @project Turen Indah Bangunan
@@ -16,12 +17,14 @@ import { cookies } from 'next/headers';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin';
 
 // Cookie configuration
+const EXPIRES_IN = 60 * 60 * 24 * 5 * 1000; // 5 days
+const COOKIE_NAME = 'tib-session';
 const COOKIE_OPTIONS = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax' as const,
     path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: EXPIRES_IN / 1000,
 };
 
 // ============================================
@@ -39,37 +42,46 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Verify the ID token with Firebase Admin
-        const decodedToken = await getAdminAuth().verifyIdToken(idToken);
-        const uid = decodedToken.uid;
+        const auth = getAdminAuth();
 
-        // Get user role from Firestore
+        // Verify the ID token first
+        const decodedToken = await auth.verifyIdToken(idToken);
+
+        // Check if user has logged in recently
+        if (new Date().getTime() / 1000 - decodedToken.auth_time > 5 * 60) {
+            return NextResponse.json(
+                { error: 'Recent sign-in required' },
+                { status: 401 }
+            );
+        }
+
+        // Create session cookie
+        const sessionCookie = await auth.createSessionCookie(idToken, {
+            expiresIn: EXPIRES_IN,
+        });
+
+        // Get user role
+        const uid = decodedToken.uid;
         const userDoc = await getAdminDb().collection('users').doc(uid).get();
         const userData = userDoc.data();
         const role = userData?.role || 'customer';
 
-        // Create session cookie
+        // Set cookies
         const cookieStore = await cookies();
+        cookieStore.set(COOKIE_NAME, sessionCookie, COOKIE_OPTIONS);
 
-        // Set session token (using UID for simplicity, could use custom session token)
-        cookieStore.set('tib-session', uid, COOKIE_OPTIONS);
+        // Role cookie (Not HTTPOnly, for client-side UI logic)
+        // Note: Do NOT trust this for security checks on server
         cookieStore.set('tib-role', role, {
             ...COOKIE_OPTIONS,
-            httpOnly: false, // Role can be read by client for UI purposes
+            httpOnly: false,
         });
 
-        return NextResponse.json({
-            success: true,
-            user: {
-                uid,
-                email: decodedToken.email,
-                role,
-            },
-        });
+        return NextResponse.json({ success: true, role });
     } catch (error) {
         console.error('Session creation error:', error);
         return NextResponse.json(
-            { error: 'Failed to create session' },
+            { error: 'Unauthorized' },
             { status: 401 }
         );
     }
@@ -82,68 +94,50 @@ export async function POST(request: NextRequest) {
 export async function GET() {
     try {
         const cookieStore = await cookies();
-        const sessionToken = cookieStore.get('tib-session')?.value;
+        const sessionCookie = cookieStore.get(COOKIE_NAME)?.value;
 
-        if (!sessionToken) {
-            return NextResponse.json(
-                { authenticated: false, user: null },
-                { status: 200 }
-            );
+        if (!sessionCookie) {
+            return NextResponse.json({ authenticated: false }, { status: 200 });
         }
 
-        // Get user data from Firestore using UID from cookie
-        const userDoc = await getAdminDb().collection('users').doc(sessionToken).get();
-
-        if (!userDoc.exists) {
-            // Clear invalid session
-            cookieStore.delete('tib-session');
-            cookieStore.delete('tib-role');
-
-            return NextResponse.json(
-                { authenticated: false, user: null },
-                { status: 200 }
-            );
-        }
-
-        const userData = userDoc.data();
+        // Verify session cookie
+        const decodedClaims = await getAdminAuth().verifySessionCookie(
+            sessionCookie,
+            true // checkRevoked
+        );
 
         return NextResponse.json({
             authenticated: true,
             user: {
-                uid: sessionToken,
-                email: userData?.email,
-                displayName: userData?.displayName,
-                role: userData?.role,
-                photoURL: userData?.photoURL,
+                uid: decodedClaims.uid,
+                email: decodedClaims.email,
             },
         });
     } catch (error) {
-        console.error('Session verification error:', error);
-        return NextResponse.json(
-            { authenticated: false, error: 'Session verification failed' },
-            { status: 500 }
-        );
+        // Session verification failed (expired or invalid)
+        return NextResponse.json({ authenticated: false }, { status: 200 });
     }
 }
 
 // ============================================
-// DELETE - Clear Session (Logout)
+// DELETE - Logout
 // ============================================
 
 export async function DELETE() {
-    try {
-        const cookieStore = await cookies();
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get(COOKIE_NAME)?.value;
 
-        // Clear session cookies
-        cookieStore.delete('tib-session');
-        cookieStore.delete('tib-role');
-
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error('Session deletion error:', error);
-        return NextResponse.json(
-            { error: 'Failed to clear session' },
-            { status: 500 }
-        );
+    if (sessionCookie) {
+        try {
+            const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie);
+            await getAdminAuth().revokeRefreshTokens(decodedClaims.sub);
+        } catch (error) {
+            // Ignore error if cookie is invalid, just clear it
+        }
     }
+
+    cookieStore.delete(COOKIE_NAME);
+    cookieStore.delete('tib-role');
+
+    return NextResponse.json({ success: true });
 }
