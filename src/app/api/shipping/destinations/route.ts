@@ -45,6 +45,7 @@ export async function GET() {
             data: enrichedCities,
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching destinations:', error);
         return NextResponse.json(
             {

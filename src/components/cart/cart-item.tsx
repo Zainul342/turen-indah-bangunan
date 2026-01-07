@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ interface CartItemProps {
     id: string;
     name: string;
     price: number;
-    image: string;
+    // image: string; // Unused
     quantity: number;
     unit?: string;
     onUpdateQuantity: (newQty: number) => void;
@@ -20,7 +19,7 @@ export function CartItem({
     id,
     name,
     price,
-    image,
+    // image,
     quantity,
     unit = "unit",
     onUpdateQuantity,

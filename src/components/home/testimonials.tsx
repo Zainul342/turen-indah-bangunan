@@ -41,7 +41,7 @@ export function Testimonials() {
                                     <Star key={i} className="h-4 w-4 fill-current" />
                                 ))}
                             </div>
-                            <p className="text-slate-600 mb-6 italic">"{review.text}"</p>
+                            <p className="text-slate-600 mb-6 italic">&quot;{review.text}&quot;</p>
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500 text-sm">
                                     {review.avatar}

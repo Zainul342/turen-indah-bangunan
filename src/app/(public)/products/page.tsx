@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ProductCard } from "@/components/product/product-card";
 import {
-    Filter,
     ChevronDown,
     LayoutGrid,
     List,

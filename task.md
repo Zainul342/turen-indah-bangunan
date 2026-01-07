@@ -215,6 +215,9 @@
 #### 4.4 Frontend Development
 
 - [x] Component library setup (Shadcn UI components)
+- [x] **Design System Refinement (Nixtio Vibe)**
+  - [x] Typography: `Outfit` (Headings) + `Inter` (Body)
+  - [x] Premium Tokens: `rounded-2xl`, `shadow-glow`
 - [ ] **Layout Components (Desktop & Mobile)**
   - [x] `header.tsx` & `footer.tsx`
   - [x] `mobile-nav.tsx` (Bottom Navigation)

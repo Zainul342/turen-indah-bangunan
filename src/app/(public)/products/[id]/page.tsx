@@ -1,13 +1,24 @@
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductInfo } from "@/components/product/product-info";
 import { RelatedProducts } from "@/components/product/related-products";
-import { Button } from "@/components/ui/button";
 import { ChevronRight, Home } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 // Dummy Data Lookup
-const PRODUCTS_DB: Record<string, any> = {
+interface ProductData {
+    id: string;
+    name: string;
+    price: number;
+    unit: string;
+    category: string;
+    description: string;
+    stock: number;
+    specs: { label: string; value: string }[];
+    images: string[];
+}
+
+const PRODUCTS_DB: Record<string, ProductData> = {
     "1": {
         id: "1",
         name: "Semen Gresik 40kg PCC High Quality",

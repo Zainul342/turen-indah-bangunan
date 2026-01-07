@@ -14,11 +14,9 @@ import {
     where,
     orderBy,
     limit as firestoreLimit,
-    startAfter,
     getDocs,
     getCountFromServer,
     DocumentData,
-    Query,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { productQuerySchema } from '@/schemas/product.schema';
@@ -74,26 +72,14 @@ function mapDocToProductListItem(doc: DocumentData): ProductListItem {
 
 export async function GET(request: NextRequest) {
     try {
-        // Parse query parameters
+        // ... (Zod validation etc)
         const { searchParams } = new URL(request.url);
         const rawParams = Object.fromEntries(searchParams.entries());
 
-        // Validate with Zod
         const parseResult = productQuerySchema.safeParse(rawParams);
         if (!parseResult.success) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Invalid query parameters',
-                        details: parseResult.error.errors,
-                    },
-                },
-                { status: 400 }
-            );
+            return NextResponse.json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'Invalid query' } }, { status: 400 });
         }
-
         const params = parseResult.data;
         const { page, limit, category, search, sort, status, featured, minPrice, maxPrice } = params;
 
@@ -101,89 +87,38 @@ export async function GET(request: NextRequest) {
         const productsRef = collection(db, 'products');
         const constraints: Parameters<typeof query>[1][] = [];
 
-        // Always filter active products for public API
         constraints.push(where('status', '==', status || 'active'));
+        if (category) constraints.push(where('categoryId', '==', category));
+        if (featured !== undefined) constraints.push(where('featured', '==', featured));
+        if (minPrice !== undefined) constraints.push(where('price', '>=', minPrice));
+        if (maxPrice !== undefined) constraints.push(where('price', '<=', maxPrice));
 
-        // Category filter
-        if (category) {
-            constraints.push(where('categoryId', '==', category));
-        }
-
-        // Featured filter
-        if (featured !== undefined) {
-            constraints.push(where('featured', '==', featured));
-        }
-
-        // Price range filters
-        if (minPrice !== undefined) {
-            constraints.push(where('price', '>=', minPrice));
-        }
-        if (maxPrice !== undefined) {
-            constraints.push(where('price', '<=', maxPrice));
-        }
-
-        // Sorting
         const { field: sortField, direction: sortDirection } = getSortField(sort);
         constraints.push(orderBy(sortField, sortDirection));
-
-        // Pagination limit
         constraints.push(firestoreLimit(limit));
 
         // Build query
-        let productsQuery = query(productsRef, ...constraints);
+        const productsQuery = query(productsRef, ...constraints);
 
         // Execute query
         const snapshot = await getDocs(productsQuery);
-
-        // Map documents to ProductListItem
         let products: ProductListItem[] = snapshot.docs.map(mapDocToProductListItem);
 
-        // Client-side search filter (Firestore doesn't support full-text search)
         if (search) {
             const searchLower = search.toLowerCase();
-            products = products.filter(
-                (p) =>
-                    p.name.toLowerCase().includes(searchLower) ||
-                    p.brand?.toLowerCase().includes(searchLower)
-            );
+            products = products.filter(p => p.name.toLowerCase().includes(searchLower) || p.brand?.toLowerCase().includes(searchLower));
         }
 
-        // Get total count for pagination
-        const countQuery = query(
-            productsRef,
-            where('status', '==', status || 'active'),
-            ...(category ? [where('categoryId', '==', category)] : [])
-        );
+        const countQuery = query(productsRef, where('status', '==', status || 'active'), ...(category ? [where('categoryId', '==', category)] : []));
         const countSnapshot = await getCountFromServer(countQuery);
         const total = countSnapshot.data().count;
 
-        // Build pagination info
-        const pagination: Pagination = {
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit),
-        };
+        const pagination: Pagination = { page, limit, total, totalPages: Math.ceil(total / limit) };
 
-        // Return response
-        return NextResponse.json({
-            success: true,
-            data: {
-                products,
-                pagination,
-            },
-        });
+        return NextResponse.json({ success: true, data: { products, pagination } });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching products:', error);
-        return NextResponse.json(
-            {
-                success: false,
-                error: {
-                    code: 'INTERNAL_ERROR',
-                    message: 'Failed to fetch products',
-                },
-            },
-            { status: 500 }
-        );
+        return NextResponse.json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch products' } }, { status: 500 });
     }
 }

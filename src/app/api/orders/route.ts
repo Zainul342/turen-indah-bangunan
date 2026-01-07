@@ -196,6 +196,7 @@ export async function POST(request: NextRequest) {
             { status: 201 }
         );
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error creating order:', error);
         return NextResponse.json(
             {
@@ -211,7 +212,7 @@ export async function POST(request: NextRequest) {
 // GET Handler - Get Order History
 // ============================================
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         // Get session
         const cookieStore = await cookies();
@@ -258,6 +259,7 @@ export async function GET(request: NextRequest) {
             data: { orders },
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching orders:', error);
         return NextResponse.json(
             {

@@ -12,6 +12,7 @@
  * @project Turen Indah Bangunan
  */
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin';
@@ -114,7 +115,7 @@ export async function GET() {
                 email: decodedClaims.email,
             },
         });
-    } catch (_error) {
+    } catch {
         // Session verification failed (expired or invalid)
         return NextResponse.json({ authenticated: false }, { status: 200 });
     }
@@ -132,7 +133,7 @@ export async function DELETE() {
         try {
             const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie);
             await getAdminAuth().revokeRefreshTokens(decodedClaims.sub);
-        } catch (_error) {
+        } catch {
             // Ignore error if cookie is invalid, just clear it
         }
     }

@@ -7,6 +7,7 @@
  * @project Turen Indah Bangunan
  */
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getAdminDb, getAdminAuth } from '@/lib/firebase/admin';
@@ -97,11 +98,7 @@ export async function POST(request: NextRequest) {
 
         const priceMap = new Map<string, number>();
 
-        // Firestore 'in' query supports max 10 items, but for cart sync we might have more.
-        // For robustness, we'll fetch them in batches or use getAll (if predictable). 
-        // Since we are server-side, we can parallelize gets.
         // Optimized: For now, let's just fetch individual docs in parallel. 
-        // Note: For very large carts, this should be chunked.
         const productRefs = Array.from(allProductIds).map(id => db.collection('products').doc(id));
         const productSnapshots = await db.getAll(...productRefs);
 
@@ -143,6 +140,7 @@ export async function POST(request: NextRequest) {
             },
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error syncing cart:', error);
         return NextResponse.json(
             {

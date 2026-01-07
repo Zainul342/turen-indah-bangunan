@@ -116,6 +116,7 @@ export async function GET(
             data: order,
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching order:', error);
         return NextResponse.json(
             {
