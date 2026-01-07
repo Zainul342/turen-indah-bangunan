@@ -195,9 +195,12 @@ export async function POST(request: NextRequest) {
             },
             { status: 201 }
         );
+    } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error creating order:', error);
         return NextResponse.json(
             {
-                success: true,
+                success: false,
                 error: { code: 'INTERNAL_ERROR', message: 'Failed to create order' },
             },
             { status: 500 }
