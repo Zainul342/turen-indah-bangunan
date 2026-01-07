@@ -174,6 +174,7 @@ export async function GET(request: NextRequest) {
             },
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching products:', error);
         return NextResponse.json(
             {

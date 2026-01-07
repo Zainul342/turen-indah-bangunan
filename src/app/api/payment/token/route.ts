@@ -169,6 +169,7 @@ export async function POST(request: NextRequest) {
             },
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error creating payment token:', error);
         return NextResponse.json(
             {

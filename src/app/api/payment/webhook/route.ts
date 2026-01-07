@@ -24,15 +24,16 @@ export async function POST(request: NextRequest) {
         // Parse payload
         const payload: MidtransWebhookPayload = await request.json();
 
-        console.log('Midtrans webhook received:', {
+        /* console.log('Midtrans webhook received:', {
             order_id: payload.order_id,
             transaction_status: payload.transaction_status,
             payment_type: payload.payment_type,
-        });
+        }); */
 
         // Verify signature
         const isValid = verifySignature(payload);
         if (!isValid) {
+            // eslint-disable-next-line no-console
             console.error('Invalid webhook signature');
             return NextResponse.json(
                 { success: false, message: 'Invalid signature' },
@@ -50,6 +51,7 @@ export async function POST(request: NextRequest) {
             .get();
 
         if (snapshot.empty) {
+            // eslint-disable-next-line no-console
             console.error('Order not found:', payload.order_id);
             return NextResponse.json(
                 { success: false, message: 'Order not found' },
@@ -59,6 +61,7 @@ export async function POST(request: NextRequest) {
 
         const orderDoc = snapshot.docs[0];
         if (!orderDoc) {
+            // eslint-disable-next-line no-console
             console.error('Order document not found:', payload.order_id);
             return NextResponse.json(
                 { success: false, message: 'Order not found' },
@@ -111,15 +114,16 @@ export async function POST(request: NextRequest) {
         // Update order
         await ordersRef.doc(orderId).update(updateData);
 
-        console.log('Order updated:', {
+        /* console.log('Order updated:', {
             orderId,
             paymentStatus,
             orderStatus,
-        });
+        }); */
 
         // Return success (Midtrans expects 200 OK)
         return NextResponse.json({ success: true });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Webhook error:', error);
         // Still return 200 to prevent Midtrans retries for parse errors
         return NextResponse.json({ success: false, error: 'Internal error' });
