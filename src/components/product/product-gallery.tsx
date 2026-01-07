@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 
 interface ProductGalleryProps {
     images: string[];
-    productName: string;
 }
 
 export function ProductGallery({ images }: ProductGalleryProps) {

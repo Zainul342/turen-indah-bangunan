@@ -29,8 +29,8 @@ export function useCart() {
         updateQuantity,
         removeItem,
         clearCart,
-        setItems,
-        setLoading,
+        // setItems,
+        // setLoading,
         setSyncing,
         mergeWithServerCart,
     } = useCartStore();
@@ -48,7 +48,27 @@ export function useCart() {
         if (!isAuthenticated) {
             hasSyncedRef.current = false;
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, user]);
+
+    /**
+     * Sync current cart state to Firestore
+     */
+    const syncCartToServer = useCallback(async () => {
+        if (!isAuthenticated) return;
+
+        try {
+            await fetch('/api/cart/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // eslint-disable-next-line react-hooks/exhaustive-deps
+                body: JSON.stringify({ items: useCartStore.getState().items }),
+            });
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('Failed to sync cart to server:', error);
+        }
+    }, [isAuthenticated]);
 
     /**
      * Sync local cart with Firestore on login
@@ -71,28 +91,12 @@ export function useCart() {
                 }
             }
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('Failed to sync cart on login:', error);
         } finally {
             setSyncing(false);
         }
-    }, [isAuthenticated, mergeWithServerCart, setSyncing]);
-
-    /**
-     * Sync current cart state to Firestore
-     */
-    const syncCartToServer = useCallback(async () => {
-        if (!isAuthenticated) return;
-
-        try {
-            await fetch('/api/cart/sync', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items: useCartStore.getState().items }),
-            });
-        } catch (error) {
-            console.error('Failed to sync cart to server:', error);
-        }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, mergeWithServerCart, setSyncing, syncCartToServer]);
 
     /**
      * Add item to cart (with auto-sync for logged in users)

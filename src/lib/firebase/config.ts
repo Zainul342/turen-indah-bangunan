@@ -37,6 +37,7 @@ function validateConfig(): void {
     const missing = requiredVars.filter((varName) => !process.env[varName]);
 
     if (missing.length > 0) {
+        // eslint-disable-next-line no-console
         console.warn(
             `⚠️ Missing Firebase environment variables: ${missing.join(', ')}\n` +
             'Make sure to create .env.local file with required values.\n' +

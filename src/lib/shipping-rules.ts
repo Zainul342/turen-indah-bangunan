@@ -53,7 +53,7 @@ export function isEligibleForExpedition(weight: number): boolean {
 export function calculateCustomFleetRates(
     cityId: string,
     subtotal: number,
-    weight: number
+    _weight: number
 ): CustomShippingOption[] {
     // Logic: Must be in Malang Area
     if (!isMalangArea(cityId)) {

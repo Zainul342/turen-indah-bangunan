@@ -25,7 +25,7 @@ import {
     getDoc,
     updateDoc,
     serverTimestamp,
-    Timestamp,
+    // Timestamp,
 } from 'firebase/firestore';
 import { auth, db } from './config';
 import type { User, UserRole, RegisterData, AuthError } from '@/types/user';
@@ -318,6 +318,7 @@ export async function checkAndPromoteAdmin(
         const userDoc = await getUserDocument(firebaseUser.uid);
         if (userDoc && userDoc.role !== 'admin') {
             await updateUserRole(firebaseUser.uid, 'admin');
+            // eslint-disable-next-line no-console
             console.log(`✅ User ${firebaseUser.email} promoted to admin`);
         }
     }

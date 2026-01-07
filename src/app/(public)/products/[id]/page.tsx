@@ -62,7 +62,7 @@ export default async function ProductDetailPage({ params }: Props) {
     const resolvedParams = await params;
     const product = PRODUCTS_DB[resolvedParams.id] || PRODUCTS_DB["1"]; // Fallback to id 1 for simulation
 
-    if (!product && resolvedParams.id !== "1") {
+    if (!product) {
         notFound();
     }
 
@@ -87,7 +87,7 @@ export default async function ProductDetailPage({ params }: Props) {
             <div className="container mx-auto px-4 md:px-6 mt-4">
                 <div className="grid lg:grid-cols-2 gap-10 xl:gap-16">
                     {/* Left: Gallery */}
-                    <ProductGallery images={product.images} productName={product.name} />
+                    <ProductGallery images={product.images} />
 
                     {/* Right: Info */}
                     <ProductInfo product={product} />

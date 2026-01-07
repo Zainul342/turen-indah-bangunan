@@ -43,6 +43,7 @@ export function mergeCarts(
         const validPrice = priceMap.get(guestItem.productId);
 
         if (validPrice === undefined) {
+            // eslint-disable-next-line no-console
             console.warn(`Skipping unknown product during sync: ${guestItem.productId}`);
             continue;
         }

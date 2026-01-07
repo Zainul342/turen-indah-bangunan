@@ -24,7 +24,7 @@ import {
 import type { RegisterData, UserState, AuthError } from '@/types/user';
 import type { User as FirebaseUser } from 'firebase/auth';
 import type { Timestamp } from 'firebase/firestore';
-import { auth } from '@/lib/firebase/config';
+// import { auth } from '@/lib/firebase/config';
 
 // ============================================
 // Helper Functions
@@ -93,6 +93,7 @@ async function createSession(firebaseUser: FirebaseUser): Promise<void> {
             body: JSON.stringify({ idToken }),
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Failed to create session:', error);
     }
 }
@@ -104,6 +105,7 @@ async function clearSession(): Promise<void> {
     try {
         await fetch('/api/auth/session', { method: 'DELETE' });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Failed to clear session:', error);
     }
 }

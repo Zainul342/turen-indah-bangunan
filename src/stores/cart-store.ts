@@ -10,7 +10,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { CartItem, AddToCartInput, Cart } from '@/types/cart';
+import type { CartItem, AddToCartInput } from '@/types/cart';
 
 // ============================================
 // Store Types
@@ -57,7 +57,7 @@ function calculateSubtotal(items: CartItem[]): number {
 
 export const useCartStore = create<CartState>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             // Initial state
             items: [],
             isLoading: false,

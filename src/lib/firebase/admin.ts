@@ -33,6 +33,7 @@ function validateAdminConfig(): void {
     const missing = requiredVars.filter((varName) => !process.env[varName]);
 
     if (missing.length > 0) {
+        // eslint-disable-next-line no-console
         console.warn(
             `⚠️ Missing Firebase Admin environment variables: ${missing.join(', ')}\n` +
             'Firebase Admin SDK will not work until these are configured.\n' +
@@ -45,6 +46,7 @@ function validateAdminConfig(): void {
 function initializeAdmin(): admin.app.App | null {
     // Only run on server
     if (!isServer()) {
+        // eslint-disable-next-line no-console
         console.error(
             '❌ Firebase Admin SDK should only be used on the server side!'
         );
@@ -66,6 +68,7 @@ function initializeAdmin(): admin.app.App | null {
 
     // If credentials are missing, return null but don't crash
     if (!projectId || !clientEmail || !privateKey) {
+        // eslint-disable-next-line no-console
         console.warn(
             '⚠️ Firebase Admin credentials not configured. Server-side features disabled.'
         );
@@ -83,6 +86,7 @@ function initializeAdmin(): admin.app.App | null {
             storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('❌ Failed to initialize Firebase Admin:', error);
         return null;
     }
