@@ -28,7 +28,7 @@ export type UserRole = 'guest' | 'customer' | 'admin' | 'b2b';
 // ============================================
 
 export interface Address {
-    id: string;
+    id?: string;
     label: string; // "Rumah", "Kantor", etc.
     recipientName: string;
     phone: string;

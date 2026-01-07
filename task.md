@@ -15,7 +15,7 @@
 | **Phase 1: Discovery & Validation** | ✅ **Completed** | 100% |
 | **Phase 2: Documentation (PRD)** | ✅ **Completed** | 100% |
 | **Phase 3: Rancangan (Design & Architecture)** | ✅ **Completed** | 100% |
-| **Phase 4: Development** | 🔄 **In Progress** | 35% |
+| **Phase 4: Development** | 🔄 **In Progress** | 55% |
 | **Phase 5: Verification & Testing** | ⏳ Pending | 0% |
 | **Phase 6: Deployment** | ⏳ Pending | 0% |
 | **Phase 7: Iteration Loop** | ⏳ Pending | 0% |
@@ -188,11 +188,11 @@
 #### 4.3 Backend Development
 
 - [x] Authentication flow (Email/Password, Google OAuth)
-- [/] Route protection (Middleware & AuthGuard)
-- [ ] Product API routes (`/api/products/*`)
-- [ ] Cart management (sessionStorage + Firestore)
-- [ ] Order creation & management
-- [ ] Payment webhook (Midtrans callback)
+- [x] Route protection (Middleware & AuthGuard)
+- [x] Product API routes (`/api/products/*`)
+- [x] Cart management (sessionStorage + Firestore)
+- [x] Order creation & management
+- [/] Payment webhook (Midtrans callback)
 - [ ] Shipping estimation (RajaOngkir integration)
 
 #### 4.4 Frontend Development
