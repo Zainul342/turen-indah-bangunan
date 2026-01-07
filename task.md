@@ -236,7 +236,11 @@
   - [x] `stock-badge.tsx` & `add-to-cart.tsx`
   - [x] `related-products.tsx`
   - [x] Page Assembly: `src/app/(public)/products/[id]/page.tsx`
-- [ ] Cart Page
+- [x] **Cart Page**
+  - [x] `cart-item.tsx` (Row with Qty update)
+  - [x] `cart-summary.tsx` (Totals & Checkout CTA)
+  - [x] `cart-empty.tsx` (Empty state)
+  - [x] Page Assembly: `src/app/(public)/cart/page.tsx`
 - [ ] Checkout Flow (3 steps)
 - [ ] Order History
 - [ ] User Profile & Settings

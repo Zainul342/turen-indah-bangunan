@@ -31,7 +31,7 @@ export function ProductCard({
     const isOutOfStock = stock <= 0;
 
     return (
-        <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
+        <div className="group relative flex flex-col overflow-hidden rounded-3xl border border-transparent bg-white shadow-card transition-all duration-300 hover:shadow-glow hover:-translate-y-1 hover:border-red-100/50">
             {/* Badge Section */}
             <div className="absolute left-3 top-3 z-10 flex flex-col gap-1.5">
                 {isNew && (
@@ -86,7 +86,7 @@ export function ProductCard({
                     {/* Action */}
                     <div className="mt-3">
                         <Button
-                            className="w-full gap-2 rounded-lg bg-slate-900 text-white hover:bg-[#D32F2F] hover:shadow-md transition-all h-9 text-xs md:text-sm"
+                            className="w-full gap-2 rounded-xl bg-slate-900 text-white hover:bg-[#D32F2F] hover:shadow-glow-sm transition-all h-10 text-xs md:text-sm font-bold"
                             disabled={isOutOfStock}
                         >
                             <ShoppingCart className="h-4 w-4" />

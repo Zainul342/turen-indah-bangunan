@@ -65,15 +65,18 @@ const config: Config = {
 				}
 			},
 			fontFamily: {
-				sans: [
-					'Inter',
-					'sans-serif'
-				]
+				sans: ["var(--font-inter)", "sans-serif"],
+				heading: ["var(--font-outfit)", "sans-serif"],
 			},
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				lg: "1rem", // 16px - Premium roundness
+				md: "0.75rem", // 12px
+				sm: "0.5rem", // 8px
+			},
+			boxShadow: {
+				'glow-sm': '0 0 10px rgba(211, 47, 47, 0.15)',
+				'glow': '0 0 20px rgba(211, 47, 47, 0.25)',
+				'card': '0 2px 10px rgba(0, 0, 0, 0.03)',
 			}
 		}
 	},

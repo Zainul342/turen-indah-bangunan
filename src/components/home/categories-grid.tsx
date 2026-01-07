@@ -27,7 +27,7 @@ export function CategoriesGrid() {
                         <Link
                             key={cat.id}
                             href={`/products?category=${cat.id}`}
-                            className="group flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50 p-6 text-center transition-all hover:border-red-100 hover:bg-white hover:shadow-md"
+                            className="group flex flex-col items-center justify-center rounded-2xl border border-transparent bg-white shadow-card p-6 text-center transition-all duration-300 hover:shadow-glow-sm hover:-translate-y-1"
                         >
                             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-100 group-hover:bg-red-50 group-hover:ring-red-100 transition-colors">
                                 <cat.icon className="h-6 w-6 text-slate-600 group-hover:text-[#D32F2F]" />

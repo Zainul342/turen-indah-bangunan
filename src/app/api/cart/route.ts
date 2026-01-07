@@ -75,6 +75,7 @@ export async function GET(request: NextRequest) {
             data: cart,
         });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching cart:', error);
         return NextResponse.json(
             {

@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ success: true, role });
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Session creation error:', error);
         return NextResponse.json(
             { error: 'Unauthorized' },
