@@ -98,6 +98,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                     const userState = await firebaseUserToState(firebaseUser);
                     setUser(userState);
                 } catch (error) {
+                    // eslint-disable-next-line no-console
                     console.error('Error syncing user state:', error);
                     clearUser();
                 }

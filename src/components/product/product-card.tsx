@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ShoppingCart, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
     id: string;
@@ -22,7 +21,7 @@ export function ProductCard({
     name,
     price,
     originalPrice,
-    image,
+    // image,
     category,
     isNew,
     stock = 10,

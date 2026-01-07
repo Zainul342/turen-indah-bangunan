@@ -8,16 +8,7 @@ import { Button } from "@/components/ui/button";
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281252462983";
 
 export function WhatsAppButton() {
-    const [isVisible, setIsVisible] = useState(false);
-
-    useEffect(() => {
-        // Show button immediately on mobile, or after scroll on desktop
-        // Strategy: Always visible, but maybe animate in
-        setIsVisible(true);
-
-        // Optional: Hide on scroll up or specific logic
-    }, []);
-
+    // Simplified: Always visible
     const handleClick = () => {
         const message = encodeURIComponent("Halo Turen Indah Bangunan, saya ingin bertanya tentang produk Anda.");
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank");

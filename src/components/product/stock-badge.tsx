@@ -1,5 +1,5 @@
 import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 
 interface StockBadgeProps {
     stock: number;

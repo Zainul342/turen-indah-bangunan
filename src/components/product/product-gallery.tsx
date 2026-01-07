@@ -9,7 +9,7 @@ interface ProductGalleryProps {
     productName: string;
 }
 
-export function ProductGallery({ images, productName }: ProductGalleryProps) {
+export function ProductGallery({ images }: ProductGalleryProps) {
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     // Fallback if no images

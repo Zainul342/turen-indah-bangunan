@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner"; // Assuming sonner is installed, or we use a simple alert/console for MVP
+// import { toast } from "sonner"; 
 
 interface AddToCartProps {
     productId: string;
@@ -11,7 +11,7 @@ interface AddToCartProps {
     minOrder?: number;
 }
 
-export function AddToCart({ productId, stock, minOrder = 1 }: AddToCartProps) {
+export function AddToCart({ productId: _productId, stock, minOrder = 1 }: AddToCartProps) {
     const [quantity, setQuantity] = useState(minOrder);
 
     const handleIncrement = () => {
