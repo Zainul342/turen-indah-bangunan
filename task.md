@@ -15,7 +15,7 @@
 | **Phase 1: Discovery & Validation** | ✅ **Completed** | 100% |
 | **Phase 2: Documentation (PRD)** | ✅ **Completed** | 100% |
 | **Phase 3: Rancangan (Design & Architecture)** | ✅ **Completed** | 100% |
-| **Phase 4: Development** | 🔄 **In Progress** | 25% |
+| **Phase 4: Development** | 🔄 **In Progress** | 35% |
 | **Phase 5: Verification & Testing** | ⏳ Pending | 0% |
 | **Phase 6: Deployment** | ⏳ Pending | 0% |
 | **Phase 7: Iteration Loop** | ⏳ Pending | 0% |
@@ -187,7 +187,8 @@
 
 #### 4.3 Backend Development
 
-- [ ] Authentication flow (Email/Password, Google OAuth)
+- [x] Authentication flow (Email/Password, Google OAuth)
+- [/] Route protection (Middleware & AuthGuard)
 - [ ] Product API routes (`/api/products/*`)
 - [ ] Cart management (sessionStorage + Firestore)
 - [ ] Order creation & management
@@ -196,7 +197,7 @@
 
 #### 4.4 Frontend Development
 
-- [ ] Component library setup (Shadcn UI components)
+- [x] Component library setup (Shadcn UI components)
 - [ ] Layout components (Header, Footer, Sidebar)
 - [ ] Landing Page
 - [ ] Product Catalog (with filters, search, sort)
@@ -358,4 +359,4 @@
 
 ---
 
-*Last updated: 6 Januari 2026*
+*Last updated: 7 Januari 2026*

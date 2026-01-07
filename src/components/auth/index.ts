@@ -11,3 +11,5 @@ export { LoginForm } from './login-form';
 export { RegisterForm } from './register-form';
 export { GoogleSignInButton } from './google-sign-in-button';
 export { UserMenu } from './user-menu';
+export { AuthGuard, withAuth } from './auth-guard';
+

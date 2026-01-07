@@ -24,6 +24,7 @@ import {
 import type { RegisterData, UserState, AuthError } from '@/types/user';
 import type { User as FirebaseUser } from 'firebase/auth';
 import type { Timestamp } from 'firebase/firestore';
+import { auth } from '@/lib/firebase/config';
 
 // ============================================
 // Helper Functions
@@ -80,6 +81,33 @@ async function firebaseUserToState(
     };
 }
 
+/**
+ * Create session cookie via API
+ */
+async function createSession(firebaseUser: FirebaseUser): Promise<void> {
+    try {
+        const idToken = await firebaseUser.getIdToken();
+        await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken }),
+        });
+    } catch (error) {
+        console.error('Failed to create session:', error);
+    }
+}
+
+/**
+ * Clear session cookie via API
+ */
+async function clearSession(): Promise<void> {
+    try {
+        await fetch('/api/auth/session', { method: 'DELETE' });
+    } catch (error) {
+        console.error('Failed to clear session:', error);
+    }
+}
+
 // ============================================
 // useAuth Hook
 // ============================================
@@ -118,6 +146,9 @@ export function useAuth() {
             // Check if should be promoted to admin
             await checkAndPromoteAdmin(result.user);
 
+            // Create session cookie for middleware
+            await createSession(result.user);
+
             // Fetch and set user state
             const userState = await firebaseUserToState(result.user);
             setUser(userState);
@@ -147,6 +178,9 @@ export function useAuth() {
             // Check if should be promoted to admin
             await checkAndPromoteAdmin(result.user);
 
+            // Create session cookie for middleware
+            await createSession(result.user);
+
             // Fetch and set user state
             const userState = await firebaseUserToState(result.user);
             setUser(userState);
@@ -174,6 +208,9 @@ export function useAuth() {
         // Check if should be promoted to admin
         await checkAndPromoteAdmin(result.user);
 
+        // Create session cookie for middleware
+        await createSession(result.user);
+
         // Fetch and set user state
         const userState = await firebaseUserToState(result.user);
         setUser(userState);
@@ -195,6 +232,9 @@ export function useAuth() {
             setLoading(false);
             return { error: result.error };
         }
+
+        // Clear session cookie
+        await clearSession();
 
         clearUser();
         return { success: true };
