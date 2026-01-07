@@ -113,7 +113,7 @@ export async function GET() {
                 email: decodedClaims.email,
             },
         });
-    } catch (error) {
+    } catch (_error) {
         // Session verification failed (expired or invalid)
         return NextResponse.json({ authenticated: false }, { status: 200 });
     }
@@ -131,7 +131,7 @@ export async function DELETE() {
         try {
             const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie);
             await getAdminAuth().revokeRefreshTokens(decodedClaims.sub);
-        } catch (error) {
+        } catch (_error) {
             // Ignore error if cookie is invalid, just clear it
         }
     }

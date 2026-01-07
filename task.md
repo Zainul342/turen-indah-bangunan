@@ -215,10 +215,27 @@
 #### 4.4 Frontend Development
 
 - [x] Component library setup (Shadcn UI components)
-- [ ] Layout components (Header, Footer, Sidebar)
-- [ ] Landing Page
-- [ ] Product Catalog (with filters, search, sort)
-- [ ] Product Detail Page
+- [ ] **Layout Components (Desktop & Mobile)**
+  - [x] `header.tsx` & `footer.tsx`
+  - [x] `mobile-nav.tsx` (Bottom Navigation)
+  - [x] `search-bar.tsx`
+  - [x] `whatsapp-button.tsx` (Floating)
+- [x] **Landing Page (Home)**
+  - [x] `promo-banner.tsx` & `hero-section.tsx`
+  - [x] `categories-grid.tsx` & `featured-products.tsx`
+  - [x] `usp-section.tsx` & `testimonials.tsx`
+  - [x] `store-locations.tsx` (Map integration)
+  - [x] `brand-partners.tsx` & `newsletter-cta.tsx`
+- [ ] **Shared & Product Components**
+  - [x] `product-card.tsx`
+  - [x] `product-grid.tsx`
+- [x] Product Catalog (with filters, search, sort)
+- [ ] **Product Detail Page (PDP)**
+  - [x] `product-gallery.tsx` (Images + Thumbnails)
+  - [x] `product-info.tsx` & `product-specs.tsx`
+  - [x] `stock-badge.tsx` & `add-to-cart.tsx`
+  - [x] `related-products.tsx`
+  - [x] Page Assembly: `src/app/(public)/products/[id]/page.tsx`
 - [ ] Cart Page
 - [ ] Checkout Flow (3 steps)
 - [ ] Order History

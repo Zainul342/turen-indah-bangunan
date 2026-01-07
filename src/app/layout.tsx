@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/auth-provider";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { MobileNav } from "@/components/layout/mobile-nav";
+import { WhatsAppButton } from "@/components/shared/whatsapp-button";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +23,17 @@ export default function RootLayout({
     return (
         <html lang="id">
             <body className={inter.className}>
-                <AuthProvider>{children}</AuthProvider>
+                <AuthProvider>
+                    <div className="flex min-h-screen flex-col bg-slate-50">
+                        <Header />
+                        <main className="flex-1 pb-16 md:pb-0">
+                            {children}
+                        </main>
+                        <Footer />
+                        <MobileNav />
+                        <WhatsAppButton />
+                    </div>
+                </AuthProvider>
             </body>
         </html>
     );
