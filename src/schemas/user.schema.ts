@@ -132,7 +132,16 @@ export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
 // B2B Registration Schema
 // ============================================
 
-export const b2bRegistrationSchema = registerSchema.extend({
+// Base schema for B2B (without refine, so we can extend)
+const b2bBaseSchema = z.object({
+    displayName: displayNameSchema,
+    email: emailSchema,
+    phone: phoneSchema,
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, 'Konfirmasi password wajib diisi'),
+    acceptTerms: z.boolean().refine((val) => val === true, {
+        message: 'Anda harus menyetujui syarat dan ketentuan',
+    }),
     companyName: z.string().min(2, 'Nama perusahaan minimal 2 karakter'),
     npwp: z
         .string()
@@ -141,4 +150,13 @@ export const b2bRegistrationSchema = registerSchema.extend({
         .or(z.literal('')),
 });
 
+export const b2bRegistrationSchema = b2bBaseSchema.refine(
+    (data) => data.password === data.confirmPassword,
+    {
+        message: 'Password tidak cocok',
+        path: ['confirmPassword'],
+    }
+);
+
 export type B2BRegistrationFormData = z.infer<typeof b2bRegistrationSchema>;
+
