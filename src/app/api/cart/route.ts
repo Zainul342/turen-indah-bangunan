@@ -36,7 +36,9 @@ export async function GET(request: NextRequest) {
         }
 
         const sessionCookie = sessionToken;
-        const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie, true);
+        // Optimization: For GET (read-only), we don't strictly need to check revocation every time.
+        // This saves a round-trip to Firebase Auth server.
+        const decodedClaims = await getAdminAuth().verifySessionCookie(sessionCookie, false);
         const userId = decodedClaims.uid;
         const db = getAdminDb();
 

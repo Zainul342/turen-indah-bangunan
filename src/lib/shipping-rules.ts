@@ -13,7 +13,8 @@
 // ============================================
 
 // RajaOngkir City IDs for Malang Raya
-const MALANG_AREA_IDS = ['255', '256', '53'];
+// Allow override via env, default to Malang Raya (Kab=255, Kota=256, Batu=53)
+const MALANG_AREA_IDS = (process.env.NEXT_PUBLIC_LOCAL_CITY_IDS || '255,256,53').split(',');
 // 255 = Kab. Malang, 256 = Kota Malang, 53 = Kota Batu
 
 const ORIGIN_CITY_ID = '255'; // Turen (Kab. Malang)

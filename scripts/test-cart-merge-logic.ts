@@ -51,7 +51,14 @@ const guestItems: CartItem[] = [
 
 console.log('--- TEST START ---');
 
-const merged = mergeCarts(existingItems, guestItems);
+// Mock Source of Truth Prices
+const priceMap = new Map<string, number>([
+    ['p1', 55000], // Updated price
+    ['p2', 1000],
+    ['p3', 200000]
+]);
+
+const merged = mergeCarts(existingItems, guestItems, priceMap);
 const { itemCount, subtotal } = calculateCartTotals(merged);
 
 console.log('Merged Items:', JSON.stringify(merged, null, 2));

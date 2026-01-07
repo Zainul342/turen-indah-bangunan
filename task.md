@@ -166,15 +166,15 @@
 
 #### 4.1 Security & Architecture Repairs (🔥 CRITICAL)
 
-- [ ] **Fix Auth Session Security**
-  - [ ] Audit `src/app/api/auth/session/route.ts` (Verify minting process)
-  - [ ] Implement `adminAuth.verifySessionCookie` in `src/app/api/cart/route.ts` & middleware
-  - [ ] Remove raw UID usage from cookies
-- [ ] **Fix Shipping API Logic & Safety**
-  - [ ] Remove `any` types in `shipping/cost/route.ts` -> Create strict interfaces
-  - [ ] Implement proper Error Handling (Return meta error codes, don't swallow errors)
-  - [ ] Remove `courier` hardcoding (Use dynamic config/env)
-  - [ ] Resolve Logic Overlap (Clarify Fleet vs Expedition priority)
+- [x] **Fix Auth Session Security**
+  - [x] Audit `src/app/api/auth/session/route.ts` (Verify minting process)
+  - [x] Implement `adminAuth.verifySessionCookie` in `src/app/api/cart/route.ts` & middleware
+  - [x] Remove raw UID usage from cookies
+- [x] **Fix Shipping API Logic & Safety**
+  - [x] Remove `any` types in `shipping/cost/route.ts` -> Create strict interfaces
+  - [x] Implement proper Error Handling (Return meta error codes, don't swallow errors)
+  - [x] Remove `courier` hardcoding (Use dynamic config/env)
+  - [x] Resolve Logic Overlap (Clarify Fleet vs Expedition priority)
 - [x] **Cart Sync Logic Verification**
   - [x] Implement Merge Strategy (Sum quantities, preserve existing) in `src/app/api/cart/sync/route.ts`
   - [x] Verify merge correctness

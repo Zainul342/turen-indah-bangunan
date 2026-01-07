@@ -88,13 +88,39 @@ export async function POST(request: NextRequest) {
             existingItems = (data?.items as CartItem[]) || [];
         }
 
-        // 4. Merge Logic
-        const finalItems = mergeCarts(existingItems, items);
+        // 4. SECURITY: Fetch latest prices from Products Collection
+        // Collect all Product IDs from both existing and guest items
+        const allProductIds = new Set([
+            ...existingItems.map(i => i.productId),
+            ...items.map(i => i.productId)
+        ]);
 
-        // 5. Recalculate Totals
+        const priceMap = new Map<string, number>();
+
+        // Firestore 'in' query supports max 10 items, but for cart sync we might have more.
+        // For robustness, we'll fetch them in batches or use getAll (if predictable). 
+        // Since we are server-side, we can parallelize gets.
+        // Optimized: For now, let's just fetch individual docs in parallel. 
+        // Note: For very large carts, this should be chunked.
+        const productRefs = Array.from(allProductIds).map(id => db.collection('products').doc(id));
+        const productSnapshots = await db.getAll(...productRefs);
+
+        productSnapshots.forEach(snap => {
+            if (snap.exists) {
+                const data = snap.data();
+                if (data?.price) {
+                    priceMap.set(snap.id, Number(data.price));
+                }
+            }
+        });
+
+        // 5. Merge Logic with Price Validation
+        const finalItems = mergeCarts(existingItems, items, priceMap);
+
+        // 6. Recalculate Totals
         const { itemCount, subtotal } = calculateCartTotals(finalItems);
 
-        // 6. Save Merged Cart
+        // 7. Save Merged Cart
         await cartDocRef.set(
             {
                 userId,
