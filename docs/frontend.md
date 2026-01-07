@@ -25,8 +25,7 @@
     * **Rounded Corners:** `rounded-xl` atau `rounded-2xl` untuk container/cards.
     * **Subtle Shadows:** Shadow yang eklusif, bukan flat total, tapi tidak harsh.
     * **Whitespace:** Ruang kosong yang cukup agar tidak sumpek.
-    * **High Contrast:** Warna solid dan teks kontras tinggi untuk keterbacaan di outdoor (sinar matahari langsung).
-    * **Solid Surfaces:** Hindari glassmorphism/blur effect yang berat. Gunakan background putih bersih atau abu-abu solid (`bg-white` / `bg-slate-50`).
+    * **Glassmorphism:** Aksen transparan untuk header/overlay (optional).
 
 ---
 
