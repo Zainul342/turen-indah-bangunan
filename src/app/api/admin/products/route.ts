@@ -58,7 +58,6 @@ export async function GET(request: NextRequest) {
         let productsQuery = db.collection('products').orderBy('createdAt', 'desc').limit(limit);
 
         if (status) {
-            // @ts-ignore - dynamic query
             productsQuery = productsQuery.where('status', '==', status);
         }
 
@@ -106,7 +105,7 @@ export async function POST(request: NextRequest) {
         }
 
         const db = getAdminDb();
-        
+
         // Check if slug already exists
         const existingSlug = await db.collection('products').where('slug', '==', parseResult.data.slug).limit(1).get();
         if (!existingSlug.empty) {

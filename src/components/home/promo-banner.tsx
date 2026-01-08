@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 
 export function PromoBanner() {
     const [isVisible, setIsVisible] = useState(true);
@@ -13,7 +14,9 @@ export function PromoBanner() {
             <div className="container mx-auto flex items-center justify-center text-center text-xs font-medium md:text-sm">
                 <p>
                     🎉 Promo Spesial: Diskon ongkir untuk pembelian di atas 50 sak semen!
-                    <span className="ml-2 underline hover:cursor-pointer font-bold">Cek Syarat & Ketentuan</span>
+                    <Link href="/products?promo=true" className="ml-2 underline hover:text-red-200 font-bold">
+                        Cek Syarat & Ketentuan
+                    </Link>
                 </p>
             </div>
             <button

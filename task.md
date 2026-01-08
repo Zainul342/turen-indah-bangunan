@@ -218,28 +218,29 @@
 - [x] **Design System Refinement (Nixtio Vibe)**
   - [x] Typography: `Outfit` (Headings) + `Inter` (Body)
   - [x] Premium Tokens: `rounded-2xl`, `shadow-glow`
-- [ ] **Layout Components (Desktop & Mobile)**
+- [x] **Layout Components (Desktop & Mobile)** ✅ TESTED
   - [x] `header.tsx` & `footer.tsx`
   - [x] `mobile-nav.tsx` (Bottom Navigation)
   - [x] `search-bar.tsx`
   - [x] `whatsapp-button.tsx` (Floating)
-- [x] **Landing Page (Home)**
+  - [x] **Cart badge fix** - now shows dynamic itemCount
+- [x] **Landing Page (Home)** ✅ TESTED (8/8 sections verified)
   - [x] `promo-banner.tsx` & `hero-section.tsx`
   - [x] `categories-grid.tsx` & `featured-products.tsx`
   - [x] `usp-section.tsx` & `testimonials.tsx`
   - [x] `store-locations.tsx` (Map integration)
   - [x] `brand-partners.tsx` & `newsletter-cta.tsx`
-- [ ] **Shared & Product Components**
+- [x] **Shared & Product Components** ✅ TESTED
   - [x] `product-card.tsx`
   - [x] `product-grid.tsx`
 - [x] Product Catalog (with filters, search, sort)
-- [ ] **Product Detail Page (PDP)**
+- [x] **Product Detail Page (PDP)** ✅ TESTED
   - [x] `product-gallery.tsx` (Images + Thumbnails)
   - [x] `product-info.tsx` & `product-specs.tsx`
   - [x] `stock-badge.tsx` & `add-to-cart.tsx`
   - [x] `related-products.tsx`
   - [x] Page Assembly: `src/app/(public)/products/[id]/page.tsx`
-- [x] **Cart Page**
+- [x] **Cart Page** ✅ TESTED (CRUD verified)
   - [x] `cart-item.tsx` (Row with Qty update)
   - [x] `cart-summary.tsx` (Totals & Checkout CTA)
   - [x] `cart-empty.tsx` (Empty state)
@@ -258,7 +259,11 @@
   - [x] Order detail page with visual timeline
   - [x] WhatsApp integration for support
   - [x] Tracking number copy functionality
-- [ ] User Profile & Settings
+- [x] **User Profile & Settings** ✅ TESTED
+  - [x] API Routes: `/api/user` (GET/PUT), `/api/user/addresses` (CRUD)
+  - [x] Components: profile-header, profile-stats, address-card, settings-row, switch
+  - [x] Pages: `/profile` overview, `/profile/settings`
+  - [x] Route protection verified (redirects to login)
 
 #### 4.5 Admin Dashboard
 

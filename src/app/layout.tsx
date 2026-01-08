@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Outfit, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { Header } from "@/components/layout/header";
@@ -9,6 +9,7 @@ import { WhatsAppButton } from "@/components/shared/whatsapp-button";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space-grotesk" });
 
 export const metadata: Metadata = {
     title: "Turen Indah Bangunan | Bahan Bangunan Berkualitas",
@@ -23,7 +24,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="id">
-            <body className={`${inter.variable} ${outfit.variable} font-sans`}>
+            <body className={`${inter.variable} ${outfit.variable} ${spaceGrotesk.variable} font-sans`}>
                 <AuthProvider>
                     <div className="flex min-h-screen flex-col bg-slate-50">
                         <Header />

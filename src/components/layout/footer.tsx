@@ -1,8 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+// Social media URLs - update these with actual company accounts
+const SOCIAL_LINKS = {
+    instagram: "https://instagram.com/turenindahbangunan",
+    facebook: "https://facebook.com/turenindahbangunan",
+};
 
 export function Footer() {
     return (
@@ -12,7 +19,13 @@ export function Footer() {
                     {/* Brand */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-bold text-white">TB</div>
+                            <Image
+                                src="/images/93c2488a85.webp"
+                                alt="Turen Indah Bangunan Logo"
+                                width={36}
+                                height={36}
+                                className="h-9 w-9 object-contain"
+                            />
                             <span className="text-xl font-bold text-slate-900">Turen Indah</span>
                         </div>
                         <p className="text-sm leading-relaxed text-slate-500">
@@ -20,12 +33,16 @@ export function Footer() {
                             Melayani eceran dan grosir dengan pengiriman cepat ke lokasi proyek Anda.
                         </p>
                         <div className="flex gap-2">
-                            <Button variant="outline" size="icon" className="rounded-full hover:bg-primary hover:text-white border-slate-200">
-                                <Instagram className="h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="icon" className="rounded-full hover:bg-primary hover:text-white border-slate-200">
-                                <Facebook className="h-4 w-4" />
-                            </Button>
+                            <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer">
+                                <Button variant="outline" size="icon" className="rounded-full hover:bg-primary hover:text-white border-slate-200">
+                                    <Instagram className="h-4 w-4" />
+                                </Button>
+                            </a>
+                            <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer">
+                                <Button variant="outline" size="icon" className="rounded-full hover:bg-primary hover:text-white border-slate-200">
+                                    <Facebook className="h-4 w-4" />
+                                </Button>
+                            </a>
                         </div>
                     </div>
 
@@ -45,7 +62,7 @@ export function Footer() {
                         <h3 className="font-bold text-slate-900">Kategori Populer</h3>
                         <ul className="space-y-2 text-sm">
                             <li><Link href="/products?category=semen" className="hover:text-primary transition-colors">Semen & Perekat</Link></li>
-                            <li><Link href="/products?category=bata" className="hover:text-primary transition-colors">Bata Ringan</Link></li>
+                            <li><Link href="/products?category=bata-ringan" className="hover:text-primary transition-colors">Bata Ringan</Link></li>
                             <li><Link href="/products?category=cat" className="hover:text-primary transition-colors">Cat Tembok</Link></li>
                             <li><Link href="/products?category=keramik" className="hover:text-primary transition-colors">Keramik Lantai</Link></li>
                             <li><Link href="/products?category=plumbing" className="hover:text-primary transition-colors">Pipa & Plumbing</Link></li>
@@ -58,7 +75,7 @@ export function Footer() {
                         <ul className="space-y-4 text-sm">
                             <li className="flex flex-col gap-1">
                                 <span className="font-medium text-slate-900">WhatsApp Order:</span>
-                                <a href="https://wa.me/6281252462983" className="text-primary hover:underline font-semibold">+62 812-5246-2983</a>
+                                <a href="https://wa.me/6281252462983" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">+62 812-5246-2983</a>
                             </li>
                             <li className="flex flex-col gap-1">
                                 <span className="font-medium text-slate-900">Email:</span>

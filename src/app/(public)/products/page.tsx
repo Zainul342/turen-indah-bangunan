@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ProductCard } from "@/components/product/product-card";
 import {
     ChevronDown,
     LayoutGrid,
     List,
-    SlidersHorizontal
+    SlidersHorizontal,
+    Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,40 +18,87 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 
-// Dummy Data for Catalog
-const DUMMY_PRODUCTS = [
-    { id: "1", name: "Semen Gresik 40kg PCC", price: 65000, category: "Semen", image: "", stock: 100 },
-    { id: "2", name: "Bata Ringan Citicon / Kubik", price: 525000, category: "Bata Ringan", image: "", stock: 50 },
-    { id: "3", name: "Cat Dulux Catylac 5kg White", price: 135000, category: "Cat", image: "", isNew: true },
-    { id: "4", name: "Keramik Asia Tile 40x40", price: 52000, category: "Keramik", image: "" },
-    { id: "5", name: "Pipa Rucika 4 Inch AW", price: 185000, category: "Plumbing", image: "" },
-    { id: "6", name: "Kran Air Onda 1/2 Inch", price: 45000, category: "Kran", image: "" },
-    { id: "7", name: "Semen Tiga Roda 40kg", price: 63500, category: "Semen", image: "" },
-    { id: "8", name: "Baut Baja Ringan 10x19", price: 250, category: "Hardwares", image: "" },
-];
+// Category slug to display name mapping
+const CATEGORY_MAP: Record<string, string> = {
+    "semen": "Semen & Perekat",
+    "bata-ringan": "Bata Ringan",
+    "builder-hardware": "Builder Hardware",
+    "flash": "Flash Sale",
+    "keramik": "Keramik Lantai",
+    "kran": "Kran & Sanitary",
+    "plumbing": "Plumbing",
+    "cat": "Cat Tembok",
+    "promo": "Promo",
+};
 
+// Sidebar categories with slugs
 const CATEGORIES = [
-    "Semua Kategori",
-    "Semen & Perekat",
-    "Bata Ringan",
-    "Cat Tembok",
-    "Keramik Lantai",
-    "Kran & Sanitary",
-    "Plumbing",
-    "Builder Hardware"
+    { slug: "", name: "Semua Kategori" },
+    { slug: "semen", name: "Semen & Perekat" },
+    { slug: "bata-ringan", name: "Bata Ringan" },
+    { slug: "cat", name: "Cat Tembok" },
+    { slug: "keramik", name: "Keramik Lantai" },
+    { slug: "kran", name: "Kran & Sanitary" },
+    { slug: "plumbing", name: "Plumbing" },
+    { slug: "builder-hardware", name: "Builder Hardware" },
 ];
 
-export default function ProductsPage() {
-    const [selectedCategory, setSelectedCategory] = useState("Semua Kategori");
+// Dummy Data for Catalog - with category slugs
+const DUMMY_PRODUCTS = [
+    { id: "1", name: "Semen Gresik 40kg PCC", price: 65000, category: "semen", image: "", stock: 100 },
+    { id: "2", name: "Bata Ringan Citicon / Kubik", price: 525000, category: "bata-ringan", image: "", stock: 50 },
+    { id: "3", name: "Cat Dulux Catylac 5kg White", price: 135000, category: "cat", image: "", isNew: true },
+    { id: "4", name: "Keramik Asia Tile 40x40", price: 52000, category: "keramik", image: "" },
+    { id: "5", name: "Pipa Rucika 4 Inch AW", price: 185000, category: "plumbing", image: "" },
+    { id: "6", name: "Kran Air Onda 1/2 Inch", price: 45000, category: "kran", image: "" },
+    { id: "7", name: "Semen Tiga Roda 40kg", price: 63500, category: "semen", image: "" },
+    { id: "8", name: "Baut Baja Ringan 10x19", price: 250, category: "builder-hardware", image: "" },
+    { id: "9", name: "Semen Holcim 50kg", price: 72000, category: "semen", image: "" },
+    { id: "10", name: "Kran Shower Toto", price: 350000, category: "kran", image: "", isNew: true },
+    { id: "11", name: "Bata Ringan Hebel", price: 550000, category: "bata-ringan", image: "" },
+    { id: "12", name: "Cat Nippon Vinilex 5kg", price: 125000, category: "cat", image: "" },
+];
+
+function ProductsContent() {
+    const searchParams = useSearchParams();
+    const categoryFromUrl = searchParams.get("category") || "";
+
+    const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
+
+    // Sync state with URL param when it changes
+    useEffect(() => {
+        setSelectedCategory(categoryFromUrl);
+    }, [categoryFromUrl]);
+
+    // Filter products based on selected category
+    const filteredProducts = useMemo(() => {
+        if (!selectedCategory || selectedCategory === "") {
+            return DUMMY_PRODUCTS;
+        }
+        return DUMMY_PRODUCTS.filter(p => p.category === selectedCategory);
+    }, [selectedCategory]);
+
+    // Get display name for current category
+    const categoryDisplayName = selectedCategory
+        ? (CATEGORY_MAP[selectedCategory] || selectedCategory)
+        : "Semua Kategori";
 
     return (
         <div className="bg-slate-50 min-h-screen pb-20">
             {/* Header / Breadcrumbs */}
             <div className="bg-white border-b py-6 md:py-10">
                 <div className="container mx-auto px-4 md:px-6">
-                    <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">Katalog Produk</h1>
-                    <p className="mt-2 text-sm text-slate-500">Menampilkan produk-produk berkualitas untuk kebutuhan bangunan Anda</p>
+                    <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">
+                        {selectedCategory ? categoryDisplayName : "Katalog Produk"}
+                    </h1>
+                    <p className="mt-2 text-sm text-slate-500">
+                        {selectedCategory
+                            ? `Menampilkan produk kategori ${categoryDisplayName}`
+                            : "Menampilkan produk-produk berkualitas untuk kebutuhan bangunan Anda"
+                        }
+                    </p>
                 </div>
             </div>
 
@@ -62,14 +111,14 @@ export default function ProductsPage() {
                             <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-900">Kategori</h3>
                             <div className="flex flex-col gap-2">
                                 {CATEGORIES.map((cat) => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => setSelectedCategory(cat)}
-                                        className={`text-left text-sm transition-colors py-1 ${selectedCategory === cat ? "text-[#D32F2F] font-bold" : "text-slate-600 hover:text-slate-900"
+                                    <Link
+                                        key={cat.slug}
+                                        href={cat.slug ? `/products?category=${cat.slug}` : "/products"}
+                                        className={`text-left text-sm transition-colors py-1 ${selectedCategory === cat.slug ? "text-[#D32F2F] font-bold" : "text-slate-600 hover:text-slate-900"
                                             }`}
                                     >
-                                        {cat}
-                                    </button>
+                                        {cat.name}
+                                    </Link>
                                 ))}
                             </div>
                         </div>
@@ -102,7 +151,7 @@ export default function ProductsPage() {
                                 Filter
                             </Button>
                             <span className="text-sm font-medium text-slate-500">
-                                Menampilkan <span className="text-slate-900">8</span> Produk
+                                Menampilkan <span className="text-slate-900">{filteredProducts.length}</span> Produk
                             </span>
                         </div>
 
@@ -134,24 +183,55 @@ export default function ProductsPage() {
                     </div>
 
                     {/* Product Grid */}
-                    <ProductGrid>
-                        {DUMMY_PRODUCTS.map((p) => (
-                            <ProductCard key={p.id} {...p} />
-                        ))}
-                    </ProductGrid>
+                    {filteredProducts.length > 0 ? (
+                        <ProductGrid>
+                            {filteredProducts.map((p) => (
+                                <ProductCard key={p.id} {...p} />
+                            ))}
+                        </ProductGrid>
+                    ) : (
+                        <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
+                            <p className="text-slate-500 mb-4">
+                                Tidak ada produk di kategori <span className="font-bold">{categoryDisplayName}</span>
+                            </p>
+                            <Link href="/products">
+                                <Button variant="outline">Lihat Semua Produk</Button>
+                            </Link>
+                        </div>
+                    )}
 
                     {/* Pagination Placeholder */}
-                    <div className="mt-12 flex justify-center">
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" disabled>Prev</Button>
-                            <Button variant="default" className="bg-[#D32F2F]">1</Button>
-                            <Button variant="outline">2</Button>
-                            <Button variant="outline">Next</Button>
+                    {filteredProducts.length > 0 && (
+                        <div className="mt-12 flex justify-center">
+                            <div className="flex items-center gap-2">
+                                <Button variant="outline" disabled>Prev</Button>
+                                <Button variant="default" className="bg-[#D32F2F]">1</Button>
+                                <Button variant="outline">2</Button>
+                                <Button variant="outline">Next</Button>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
             </div>
         </div>
+    );
+}
+
+// Loading fallback
+function ProductsLoading() {
+    return (
+        <div className="bg-slate-50 min-h-screen flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-[#D32F2F]" />
+        </div>
+    );
+}
+
+// Main export with Suspense wrapper
+export default function ProductsPage() {
+    return (
+        <Suspense fallback={<ProductsLoading />}>
+            <ProductsContent />
+        </Suspense>
     );
 }

@@ -67,11 +67,26 @@ const config: Config = {
 			fontFamily: {
 				sans: ["var(--font-inter)", "sans-serif"],
 				heading: ["var(--font-outfit)", "sans-serif"],
+				display: ["var(--font-space-grotesk)", "sans-serif"],
 			},
 			borderRadius: {
-				lg: "1rem", // 16px - Premium roundness
+				lg: "1rem", // 16px
 				md: "0.75rem", // 12px
 				sm: "0.5rem", // 8px
+				'nixtio-md': '24px', // Standard rounded
+				'nixtio-u': '0px 0px 24px 24px', // Top flat, bottom rounded
+			},
+			letterSpacing: {
+				'tighter-nixtio': '-0.06em', // Approx -3.6px
+				'tight-nixtio': '-0.03em',
+			},
+			fontSize: {
+				'nixtio-giant': ['144px', { lineHeight: '1', letterSpacing: '-0.06em' }],
+				'nixtio-4xl': ['85px', { lineHeight: '1', letterSpacing: '-0.04em' }],
+				'nixtio-3xl': ['60px', { lineHeight: '1.1', letterSpacing: '-0.04em' }],
+			},
+			spacing: {
+				'nixtio-pad': '30px',
 			},
 			boxShadow: {
 				'glow-sm': '0 0 10px rgba(211, 47, 47, 0.15)',

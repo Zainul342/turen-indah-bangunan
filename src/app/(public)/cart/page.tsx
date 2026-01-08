@@ -1,50 +1,34 @@
 "use client";
 
-import { useState } from "react";
 import { CartItem } from "@/components/cart/cart-item";
 import { CartSummary } from "@/components/cart/cart-summary";
 import { CartEmpty } from "@/components/cart/cart-empty";
-import { ChevronRight, Home } from "lucide-react";
+import { ChevronRight, Home, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-
-// Dummy Initial Data
-const INITIAL_CART = [
-    {
-        id: "1",
-        name: "Semen Gresik 40kg PCC High Quality",
-        price: 65000,
-        image: "",
-        quantity: 10,
-        unit: "sak"
-    },
-    {
-        id: "2",
-        name: "Cat Dulux Catylac 5kg White",
-        price: 135000,
-        image: "",
-        quantity: 2,
-        unit: "kaleng"
-    }
-];
+import { useCart } from "@/hooks/use-cart";
 
 export default function CartPage() {
-    const [items, setItems] = useState(INITIAL_CART);
+    const { items, itemCount, subtotal, updateQuantity, removeFromCart, clearCart, isLoading } = useCart();
 
     const handleUpdateQuantity = (id: string, newQty: number) => {
-        setItems((prev) =>
-            prev.map((item) => item.id === id ? { ...item, quantity: newQty } : item)
-        );
+        updateQuantity(id, newQty);
     };
 
     const handleRemove = (id: string) => {
-        setItems((prev) => prev.filter((item) => item.id !== id));
+        removeFromCart(id);
     };
 
-    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+    // Show loading state
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
 
-    // Initial dummy state: if empty show empty state
+    // If empty show empty state
     if (items.length === 0) {
         return (
             <div className="container mx-auto px-4 py-8 md:px-6">
@@ -75,10 +59,13 @@ export default function CartPage() {
                         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                             {items.map((item) => (
                                 <CartItem
-                                    key={item.id}
-                                    {...item}
-                                    onUpdateQuantity={(qty) => handleUpdateQuantity(item.id, qty)}
-                                    onRemove={() => handleRemove(item.id)}
+                                    key={item.productId}
+                                    id={item.productId}
+                                    name={item.productName}
+                                    price={item.price}
+                                    quantity={item.quantity}
+                                    onUpdateQuantity={(qty) => handleUpdateQuantity(item.productId, qty)}
+                                    onRemove={() => handleRemove(item.productId)}
                                 />
                             ))}
 
@@ -88,7 +75,7 @@ export default function CartPage() {
                                         &larr; Lanjut Belanja
                                     </Button>
                                 </Link>
-                                <Button variant="outline" className="text-red-600 hover:bg-red-50 hover:text-red-700 border-red-100" onClick={() => setItems([])}>
+                                <Button variant="outline" className="text-red-600 hover:bg-red-50 hover:text-red-700 border-red-100" onClick={() => clearCart()}>
                                     Hapus Semua
                                 </Button>
                             </div>
