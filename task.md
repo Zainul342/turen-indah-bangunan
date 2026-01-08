@@ -244,8 +244,20 @@
   - [x] `cart-summary.tsx` (Totals & Checkout CTA)
   - [x] `cart-empty.tsx` (Empty state)
   - [x] Page Assembly: `src/app/(public)/cart/page.tsx`
-- [ ] Checkout Flow (3 steps)
-- [ ] Order History
+- [x] **Checkout Flow (3 steps)**
+  - [x] Types, Schemas, Store (Zustand with session persistence)
+  - [x] Step 1: Shipping (Address Form, Destination Search, Shipping Options)
+  - [x] Step 2: Payment (Order Review, Customer Notes, Midtrans Snap)
+  - [x] Success Page with Suspense boundary
+  - [x] API Routes (validate, shipping, create-order)
+  - [x] Dependencies (use-cart, shipping-rules, window.snap types)
+- [x] **Order History**
+  - [x] Order types extended with STATUS_CONFIG and TAB_FILTERS
+  - [x] UI Components (status-badge, tabs, card, timeline, empty)
+  - [x] Order list page with tab filtering
+  - [x] Order detail page with visual timeline
+  - [x] WhatsApp integration for support
+  - [x] Tracking number copy functionality
 - [ ] User Profile & Settings
 
 #### 4.5 Admin Dashboard

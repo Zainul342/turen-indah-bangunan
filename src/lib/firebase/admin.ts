@@ -133,3 +133,28 @@ export function getAdminDb(): admin.firestore.Firestore {
     }
     return adminDb;
 }
+
+/**
+ * Verify Firebase Session Cookie
+ * Returns decoded token with user info if valid, null otherwise
+ */
+export async function verifySessionCookie(
+    sessionCookie: string
+): Promise<{ uid: string; email?: string } | null> {
+    if (!adminAuth) {
+        return null;
+    }
+
+    try {
+        const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
+        return {
+            uid: decodedClaims.uid,
+            email: decodedClaims.email,
+        };
+    } catch {
+        // eslint-disable-next-line no-console
+        console.error('Session cookie verification failed');
+        return null;
+    }
+}
+
