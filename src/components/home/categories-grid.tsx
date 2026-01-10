@@ -22,20 +22,20 @@ export function CategoriesGrid() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 sm:gap-4">
                     {CATEGORIES.map((cat) => (
                         <Link
                             key={cat.id}
                             href={`/products?category=${cat.id}`}
-                            className="group flex flex-col items-center justify-center rounded-2xl border border-transparent bg-white shadow-card p-6 text-center transition-all duration-300 hover:shadow-glow-sm hover:-translate-y-1"
+                            className="group flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-white shadow-sm p-5 md:p-6 text-center transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-red-100"
                         >
-                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-100 group-hover:bg-red-50 group-hover:ring-red-100 transition-colors">
-                                <cat.icon className="h-6 w-6 text-slate-600 group-hover:text-[#D32F2F]" />
+                            <div className="mb-3 md:mb-4 flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-full bg-slate-50 border border-slate-100 group-hover:bg-red-50 group-hover:border-red-200 transition-all">
+                                <cat.icon className="h-6 w-6 md:h-7 md:w-7 text-slate-600 group-hover:text-brand group-hover:scale-110 transition-all" />
                             </div>
-                            <h3 className="font-semibold text-slate-900 text-sm md:text-base group-hover:text-[#D32F2F]">
+                            <h3 className="font-semibold text-slate-900 text-xs md:text-sm group-hover:text-brand transition-colors">
                                 {cat.name}
                             </h3>
-                            <span className="mt-1 text-xs text-slate-500">
+                            <span className="mt-1 text-[10px] md:text-xs text-slate-500">
                                 {cat.count}
                             </span>
                         </Link>

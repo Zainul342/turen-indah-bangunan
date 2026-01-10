@@ -30,9 +30,9 @@ export function ProductCard({
     const isOutOfStock = stock <= 0;
 
     return (
-        <div className="group relative flex flex-col overflow-hidden rounded-3xl border border-transparent bg-white shadow-card transition-all duration-300 hover:shadow-glow hover:-translate-y-1 hover:border-red-100/50">
+        <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-red-100">
             {/* Badge Section */}
-            <div className="absolute left-3 top-3 z-10 flex flex-col gap-1.5">
+            <div className="absolute left-2 top-2 z-10 flex flex-col gap-1.5">
                 {isNew && (
                     <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-700">
                         Baru
@@ -46,16 +46,18 @@ export function ProductCard({
             </div>
 
             {/* Wishlist Button */}
-            <button className="absolute right-3 top-3 z-10 rounded-full bg-white/80 p-2 text-slate-400 opacity-0 transition-opacity hover:bg-white hover:text-red-500 group-hover:opacity-100 backdrop-blur-sm">
+            <button className="absolute right-2 top-2 z-10 rounded-full bg-white/90 p-2 text-slate-400 opacity-0 transition-all hover:bg-white hover:text-red-500 group-hover:opacity-100 backdrop-blur-sm hover:scale-110">
                 <Heart className="h-4 w-4" />
             </button>
 
             {/* Image */}
-            <Link href={`/products/${id}`} className="relative aspect-square overflow-hidden bg-slate-50">
-                {/* Replace with next/image in production */}
-                <div className="flex h-full w-full items-center justify-center text-4xl select-none">
-                    {/* Placeholder icon based on category/name if no image */}
-                    📦
+            <Link href={`/products/${id}`} className="relative aspect-square overflow-hidden bg-slate-50 group/image">
+                {/* Placeholder with better styling */}
+                <div className="flex h-full w-full items-center justify-center text-slate-300 bg-gradient-to-br from-slate-50 to-slate-100 group-hover/image:scale-105 transition-transform duration-500">
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="text-5xl">📦</div>
+                        <span className="text-xs font-medium text-slate-400">{category}</span>
+                    </div>
                 </div>
             </Link>
 
@@ -70,9 +72,9 @@ export function ProductCard({
                     </h3>
                 </Link>
 
-                <div className="mt-auto flex flex-col gap-1">
+                <div className="mt-auto flex flex-col gap-2">
                     <div className="flex items-baseline gap-2">
-                        <span className="text-lg font-bold text-[#D32F2F]">
+                        <span className="text-lg font-bold text-brand">
                             Rp {price.toLocaleString("id-ID")}
                         </span>
                         {originalPrice && (
@@ -83,15 +85,13 @@ export function ProductCard({
                     </div>
 
                     {/* Action */}
-                    <div className="mt-3">
-                        <Button
-                            className="w-full gap-2 rounded-xl bg-slate-900 text-white hover:bg-[#D32F2F] hover:shadow-glow-sm transition-all h-10 text-xs md:text-sm font-bold"
-                            disabled={isOutOfStock}
-                        >
-                            <ShoppingCart className="h-4 w-4" />
-                            {isOutOfStock ? "Stok Habis" : "Keranjang"}
-                        </Button>
-                    </div>
+                    <Button
+                        className="w-full gap-2 rounded-lg bg-slate-900 text-white hover:bg-brand hover:shadow-glow-sm transition-all h-9 text-sm font-semibold"
+                        disabled={isOutOfStock}
+                    >
+                        <ShoppingCart className="h-4 w-4" />
+                        {isOutOfStock ? "Stok Habis" : "Keranjang"}
+                    </Button>
                 </div>
             </div>
         </div>

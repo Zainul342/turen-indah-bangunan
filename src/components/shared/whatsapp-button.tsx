@@ -19,12 +19,12 @@ export function WhatsAppButton() {
             onClick={handleClick}
             size="icon"
             className={cn(
-                "fixed bottom-24 right-4 z-50 h-14 w-14 rounded-full bg-[#25D366] shadow-lg transition-transform duration-300 hover:bg-[#128C7E] md:bottom-8 md:right-8",
+                "fixed bottom-20 right-4 z-50 h-14 w-14 rounded-full bg-[#25D366] shadow-xl hover:shadow-2xl transition-all duration-300 hover:bg-[#128C7E] hover:scale-110 active:scale-95 md:bottom-8 md:right-8",
                 "animate-in fade-in zoom-in duration-500"
             )}
             aria-label="Chat WhatsApp"
         >
-            <MessageCircle className="h-7 w-7 text-white" />
+            <MessageCircle className="h-6 w-6 text-white" />
         </Button>
     );
 }

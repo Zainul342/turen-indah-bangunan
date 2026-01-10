@@ -72,11 +72,12 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
 
   body {
-    @apply bg-background text-foreground antialiased selection:bg-red-100 selection:text-red-900;
+    /* Nixtio Premium: Off-white background (#F5F5F5) */
+    @apply bg-nix-offwhite text-foreground antialiased selection:bg-red-100 selection:text-red-900;
   }
 
   /* Modern Scrollbar */
@@ -97,13 +98,19 @@
     background: #94a3b8;
   }
 
-  /* Typography Refinement */
-  h1,
-  h2,
+  /* Premium Typography */
+  h1 {
+    @apply font-heading font-semibold tracking-nix-tight;
+  }
+
+  h2 {
+    @apply font-heading font-semibold tracking-nix-tight;
+  }
+
   h3,
   h4,
   h5,
   h6 {
-    @apply font-heading tracking-tight;
+    @apply font-heading font-medium tracking-nix-normal;
   }
 }

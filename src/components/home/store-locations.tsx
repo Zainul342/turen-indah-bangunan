@@ -16,13 +16,13 @@ export function StoreLocations() {
             <div className="container mx-auto px-4 md:px-6 relative z-10">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                     <div>
-                        <div className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 mb-4">
+                        <div className="inline-flex items-center rounded-full bg-blue-50 border border-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 mb-4">
                             Lokasi Kami
                         </div>
-                        <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-4">
+                        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-4">
                             Dekat dengan Proyek Anda
                         </h2>
-                        <p className="text-slate-600 mb-8 leading-relaxed">
+                        <p className="text-sm md:text-base text-slate-600 mb-8 leading-relaxed">
                             Dengan lebih dari 20 cabang tersebar di Malang Raya, kami memastikan pengiriman material bangunan
                             lebih cepat, hemat ongkir, dan tepat waktu ke lokasi proyek Anda.
                         </p>
@@ -36,7 +36,7 @@ export function StoreLocations() {
                                     rel="noopener noreferrer"
                                     className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 hover:border-blue-100 hover:bg-blue-50/50 transition-colors group cursor-pointer"
                                 >
-                                    <div className="mt-1 h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+                                    <div className="mt-1 h-9 w-9 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-600 transition-all">
                                         <MapPin className="h-4 w-4" />
                                     </div>
                                     <div className="flex-1">

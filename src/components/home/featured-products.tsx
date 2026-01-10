@@ -41,9 +41,9 @@ const FEATURED_PRODUCTS = [
 
 export function FeaturedProducts() {
     return (
-        <section className="py-12 bg-slate-50">
+        <section className="py-12 md:py-16 bg-slate-50">
             <div className="container mx-auto px-4 md:px-6">
-                <div className="mb-8 flex items-end justify-between">
+                <div className="mb-8 md:mb-10 flex items-end justify-between">
                     <div>
                         <h2 className="text-2xl font-bold tracking-tight text-slate-900">Produk Unggulan</h2>
                         <p className="mt-1 text-slate-500">Pilihan terbaik minggu ini untuk proyek Anda</p>
@@ -53,7 +53,7 @@ export function FeaturedProducts() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 md:grid-cols-3 lg:grid-cols-4">
                     {FEATURED_PRODUCTS.map((product) => (
                         <ProductCard
                             key={product.id}

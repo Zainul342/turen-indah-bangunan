@@ -28,22 +28,22 @@ export function Testimonials() {
     return (
         <section className="py-16 bg-slate-50">
             <div className="container mx-auto px-4 md:px-6">
-                <div className="mb-10 text-center">
+                <div className="mb-10 md:mb-12 text-center">
                     <h2 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Apa Kata Pelanggan?</h2>
-                    <p className="mt-2 text-slate-500">Ribuan kontraktor dan pemilik rumah mempercayai Turen Indah Bangunan.</p>
+                    <p className="mt-2 text-sm md:text-base text-slate-600">Ribuan kontraktor dan pemilik rumah mempercayai Turen Indah Bangunan.</p>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-3">
+                <div className="grid gap-4 md:gap-6 md:grid-cols-3">
                     {REVIEWS.map((review, i) => (
-                        <div key={i} className="rounded-2xl bg-white p-6 shadow-sm border border-slate-100">
-                            <div className="flex items-center gap-1 text-yellow-400 mb-4">
+                        <div key={i} className="rounded-2xl bg-white p-5 md:p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-200 transition-all">
+                            <div className="flex items-center gap-1 text-yellow-400 mb-3 md:mb-4">
                                 {[...Array(5)].map((_, i) => (
                                     <Star key={i} className="h-4 w-4 fill-current" />
                                 ))}
                             </div>
-                            <p className="text-slate-600 mb-6 italic">&quot;{review.text}&quot;</p>
+                            <p className="text-sm md:text-base text-slate-600 mb-5 md:mb-6 italic leading-relaxed">&quot;{review.text}&quot;</p>
                             <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500 text-sm">
+                                <div className="h-10 w-10 rounded-full bg-slate-100 border-2 border-slate-200 flex items-center justify-center font-bold text-slate-600 text-sm">
                                     {review.avatar}
                                 </div>
                                 <div>

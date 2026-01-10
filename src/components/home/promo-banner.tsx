@@ -10,11 +10,11 @@ export function PromoBanner() {
     if (!isVisible) return null;
 
     return (
-        <div className="relative bg-[#D32F2F] px-4 py-3 text-white">
-            <div className="container mx-auto flex items-center justify-center text-center text-xs font-medium md:text-sm">
+        <div className="relative bg-brand px-4 py-3 text-white">
+            <div className="container mx-auto flex items-center justify-center text-center text-xs md:text-sm font-medium">
                 <p>
-                    🎉 Promo Spesial: Diskon ongkir untuk pembelian di atas 50 sak semen!
-                    <Link href="/products?promo=true" className="ml-2 underline hover:text-red-200 font-bold">
+                    🎉 <span className="hidden sm:inline">Promo Spesial: </span>Diskon ongkir untuk pembelian di atas 50 sak semen!
+                    <Link href="/products?promo=true" className="ml-2 underline hover:text-red-100 font-bold transition-colors">
                         Cek Syarat & Ketentuan
                     </Link>
                 </p>

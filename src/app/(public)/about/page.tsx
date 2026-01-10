@@ -15,14 +15,13 @@ export default function AboutPage() {
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="max-w-3xl">
                         <div className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold mb-4">
-                            Sejak 2005
+                            Melayani Sejak 2005
                         </div>
                         <h1 className="text-3xl md:text-5xl font-bold mb-6">
-                            Tentang Turen Indah Bangunan
+                            Lebih Dari Sekadar Toko Bangunan
                         </h1>
                         <p className="text-lg text-slate-300 leading-relaxed">
-                            Berawal dari toko bangunan kecil di Turen, kini kami telah berkembang menjadi
-                            jaringan retail bahan bangunan terbesar di Malang Raya dengan lebih dari 20 cabang.
+                            Bermula dari sebuah ruko kecil di Turen, kami tumbuh karena satu hal: <strong>Kepercayaan Anda</strong>. Kini, kami hadir di 20+ titik untuk memastikan proyek Anda tidak pernah berhenti karena kekurangan material.
                         </p>
                     </div>
                 </div>
@@ -77,10 +76,10 @@ export default function AboutPage() {
                                 <h2 className="text-2xl font-bold text-slate-900">Misi</h2>
                             </div>
                             <ul className="text-slate-600 space-y-2">
-                                <li>• Menyediakan produk bahan bangunan berkualitas dengan harga terjangkau</li>
-                                <li>• Memberikan pelayanan cepat dan ramah kepada setiap pelanggan</li>
-                                <li>• Memperluas jangkauan cabang untuk kemudahan akses pelanggan</li>
-                                <li>• Membangun kemitraan jangka panjang dengan supplier dan kontraktor</li>
+                                <li>• Menjamin ketersediaan stok agar proyek Anda tidak mandek</li>
+                                <li>• Harga jujur dan transparan, tanpa markup tersembunyi</li>
+                                <li>• Pengiriman tepat waktu dengan armada sendiri</li>
+                                <li>• Menjadi mitra diskusi teknis, bukan sekadar penjual</li>
                             </ul>
                         </div>
                     </div>

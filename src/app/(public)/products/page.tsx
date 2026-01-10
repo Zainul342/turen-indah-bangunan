@@ -91,12 +91,12 @@ function ProductsContent() {
             <div className="bg-white border-b py-6 md:py-10">
                 <div className="container mx-auto px-4 md:px-6">
                     <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">
-                        {selectedCategory ? categoryDisplayName : "Katalog Produk"}
+                        {selectedCategory ? categoryDisplayName : "Pusat Belanja Material"}
                     </h1>
                     <p className="mt-2 text-sm text-slate-500">
                         {selectedCategory
                             ? `Menampilkan produk kategori ${categoryDisplayName}`
-                            : "Menampilkan produk-produk berkualitas untuk kebutuhan bangunan Anda"
+                            : "Kualitas Terjamin, Garansi Retur. Temukan material terbaik untuk proyek Anda."
                         }
                     </p>
                 </div>
