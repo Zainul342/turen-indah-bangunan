@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ShoppingCart, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/stores/cart-store";
 
 interface ProductCardProps {
     id: string;
@@ -21,13 +22,32 @@ export function ProductCard({
     name,
     price,
     originalPrice,
-    // image,
+    image,
     category,
     isNew,
     stock = 10,
 }: ProductCardProps) {
     const discount = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
     const isOutOfStock = stock <= 0;
+
+    // Connect to cart store
+    const addItem = useCartStore((state) => state.addItem);
+
+    const handleAddToCart = (e: React.MouseEvent) => {
+        e.preventDefault(); // Prevent any parent link navigation (if any)
+        e.stopPropagation();
+
+        addItem({
+            productId: id,
+            productName: name,
+            productImage: image || '/images/placeholder.png', // Fallback if image is missing
+            price: price,
+            quantity: 1,
+        });
+
+        // Simple feedback for now
+        alert("Produk berhasil ditambahkan ke keranjang!");
+    };
 
     return (
         <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-red-100">
@@ -52,13 +72,22 @@ export function ProductCard({
 
             {/* Image */}
             <Link href={`/products/${id}`} className="relative aspect-square overflow-hidden bg-slate-50 group/image">
-                {/* Placeholder with better styling */}
-                <div className="flex h-full w-full items-center justify-center text-slate-300 bg-gradient-to-br from-slate-50 to-slate-100 group-hover/image:scale-105 transition-transform duration-500">
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="text-5xl">📦</div>
-                        <span className="text-xs font-medium text-slate-400">{category}</span>
+                {/* Check if image exists, otherwise show placeholder */}
+                {image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                        src={image}
+                        alt={name}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover/image:scale-105"
+                    />
+                ) : (
+                    <div className="flex h-full w-full items-center justify-center text-slate-300 bg-gradient-to-br from-slate-50 to-slate-100 group-hover/image:scale-105 transition-transform duration-500">
+                        <div className="flex flex-col items-center gap-2">
+                            <div className="text-5xl">📦</div>
+                            <span className="text-xs font-medium text-slate-400">{category}</span>
+                        </div>
                     </div>
-                </div>
+                )}
             </Link>
 
             {/* Content */}
@@ -88,6 +117,7 @@ export function ProductCard({
                     <Button
                         className="w-full gap-2 rounded-lg bg-slate-900 text-white hover:bg-brand hover:shadow-glow-sm transition-all h-9 text-sm font-semibold"
                         disabled={isOutOfStock}
+                        onClick={handleAddToCart}
                     >
                         <ShoppingCart className="h-4 w-4" />
                         {isOutOfStock ? "Stok Habis" : "Keranjang"}

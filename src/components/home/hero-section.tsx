@@ -23,9 +23,11 @@ export function HeroSection() {
 
                         {/* Hero Title - Responsive Typography */}
                         {/* Hero Title - Responsive Typography */}
-                        <h1 className="text-[clamp(4.5rem,14vw,9rem)] leading-[0.8] tracking-nix-tight text-nix-black select-none">
-                            <span className="font-heading font-bold block mb-2">BANGUN</span>
-                            <span className="font-aesthetic font-normal italic text-brand block">Tanpa Ragu.</span>
+                        <h1 className="text-[clamp(4.5rem,14vw,9rem)] leading-[0.85] tracking-tight text-nix-black select-none">
+                            <span className="font-heading font-black tracking-tighter block mb-1">BANGUN</span>
+                            <span className="font-aesthetic font-normal italic block text-slate-800">
+                                Tanpa Ragu<span className="text-brand font-bold not-italic">.</span>
+                            </span>
                         </h1>
 
                         <p className="mt-8 max-w-[480px] text-base md:text-lg text-nix-gray font-normal leading-relaxed tracking-nix-normal">

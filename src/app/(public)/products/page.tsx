@@ -18,6 +18,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Slider } from "@/components/ui/slider";
 import Link from "next/link";
 
 // Category slug to display name mapping
@@ -66,24 +67,65 @@ function ProductsContent() {
     const categoryFromUrl = searchParams.get("category") || "";
 
     const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
+    const [priceRange, setPriceRange] = useState([0, 1000000]);
+    const [sortBy, setSortBy] = useState<"newest" | "price-asc" | "price-desc" | "popular">("newest");
+    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
     // Sync state with URL param when it changes
     useEffect(() => {
         setSelectedCategory(categoryFromUrl);
     }, [categoryFromUrl]);
 
-    // Filter products based on selected category
+    // Filter AND Sort products
     const filteredProducts = useMemo(() => {
-        if (!selectedCategory || selectedCategory === "") {
-            return DUMMY_PRODUCTS;
+        let result = [...DUMMY_PRODUCTS]; // Clone to avoid mutating original
+
+        // Filter by Category
+        if (selectedCategory && selectedCategory !== "") {
+            result = result.filter(p => p.category === selectedCategory);
         }
-        return DUMMY_PRODUCTS.filter(p => p.category === selectedCategory);
-    }, [selectedCategory]);
+
+        // Filter by Price
+        result = result.filter(p => p.price >= priceRange[0]! && p.price <= priceRange[1]!);
+
+        // Sort
+        switch (sortBy) {
+            case "price-asc":
+                result.sort((a, b) => a.price - b.price);
+                break;
+            case "price-desc":
+                result.sort((a, b) => b.price - a.price);
+                break;
+            case "popular":
+                // For now, just reverse (mock popularity)
+                result.reverse();
+                break;
+            case "newest":
+            default:
+                // Keep original order (newest first assumed)
+                break;
+        }
+
+        return result;
+    }, [selectedCategory, priceRange, sortBy]);
 
     // Get display name for current category
     const categoryDisplayName = selectedCategory
         ? (CATEGORY_MAP[selectedCategory] || selectedCategory)
         : "Semua Kategori";
+
+    const handlePriceChange = (value: number[]) => {
+        setPriceRange(value);
+    };
+
+    // Sort label map
+    const SORT_LABELS: Record<typeof sortBy, string> = {
+        "newest": "Terbaru",
+        "price-asc": "Harga: Rendah - Tinggi",
+        "price-desc": "Harga: Tinggi - Rendah",
+        "popular": "Terpopuler",
+    };
+
 
     return (
         <div className="bg-slate-50 min-h-screen pb-20">
@@ -93,7 +135,7 @@ function ProductsContent() {
                     <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">
                         {selectedCategory ? categoryDisplayName : "Pusat Belanja Material"}
                     </h1>
-                    <p className="mt-2 text-sm text-slate-500">
+                    <p className="mt-2 text-slate-500">
                         {selectedCategory
                             ? `Menampilkan produk kategori ${categoryDisplayName}`
                             : "Kualitas Terjamin, Garansi Retur. Temukan material terbaik untuk proyek Anda."
@@ -126,15 +168,17 @@ function ProductsContent() {
                         <div className="border-t pt-8">
                             <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-900">Harga</h3>
                             <div className="space-y-4">
-                                {/* Placeholder for range slider */}
-                                <div className="h-1 rounded-full bg-slate-200 relative">
-                                    <div className="absolute left-0 right-1/2 h-full bg-[#D32F2F] rounded-full"></div>
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-white border-2 border-[#D32F2F] shadow-sm"></div>
-                                    <div className="absolute right-1/2 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-white border-2 border-[#D32F2F] shadow-sm"></div>
-                                </div>
+                                <Slider
+                                    defaultValue={[0, 1000000]}
+                                    max={1000000}
+                                    step={5000}
+                                    value={priceRange}
+                                    onValueChange={handlePriceChange}
+                                    className="py-4"
+                                />
                                 <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
-                                    <span>Rp 0</span>
-                                    <span>Rp 1.000.000+</span>
+                                    <span>Rp {priceRange[0].toLocaleString("id-ID")}</span>
+                                    <span>Rp {priceRange[1].toLocaleString("id-ID")}+</span>
                                 </div>
                             </div>
                         </div>
@@ -159,23 +203,41 @@ function ProductsContent() {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="outline" size="sm" className="gap-2">
-                                        Urutkan: Terbaru
+                                        Urutkan: {SORT_LABELS[sortBy]}
                                         <ChevronDown className="h-3 w-3" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>Harga: Rendah - Tinggi</DropdownMenuItem>
-                                    <DropdownMenuItem>Harga: Tinggi - Rendah</DropdownMenuItem>
-                                    <DropdownMenuItem>Terbaru</DropdownMenuItem>
-                                    <DropdownMenuItem>Terpopuler</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortBy("price-asc")}>
+                                        Harga: Rendah - Tinggi
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortBy("price-desc")}>
+                                        Harga: Tinggi - Rendah
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortBy("newest")}>
+                                        Terbaru
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortBy("popular")}>
+                                        Terpopuler
+                                    </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
 
                             <div className="hidden items-center gap-1 border-l pl-2 sm:flex">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={`h-8 w-8 ${viewMode === "grid" ? "text-[#D32F2F]" : "text-slate-400"}`}
+                                    onClick={() => setViewMode("grid")}
+                                >
                                     <LayoutGrid className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={`h-8 w-8 ${viewMode === "list" ? "text-[#D32F2F]" : "text-slate-400"}`}
+                                    onClick={() => setViewMode("list")}
+                                >
                                     <List className="h-4 w-4" />
                                 </Button>
                             </div>
