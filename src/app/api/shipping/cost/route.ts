@@ -2,9 +2,10 @@
  * Shipping Cost API
  * ==================
  * POST /api/shipping/cost - Calculate shipping cost (Hybrid)
- * Hardened version with strict typing, error handling, and auth.
+ * Hardened version with strict typing, error handling, auth, and caching.
  *
  * Security: Requires valid session cookie to prevent abuse/spam.
+ * Performance: Caches RajaOngkir results for 1 hour.
  *
  * @file src/app/api/shipping/cost/route.ts
  * @project Turen Indah Bangunan
@@ -12,6 +13,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { unstable_cache } from 'next/cache';
 import { calculateRajaOngkirCost } from '@/lib/rajaongkir';
 import {
     calculateCustomFleetRates,
@@ -20,6 +22,7 @@ import {
     isEligibleForExpedition,
 } from '@/lib/shipping-rules';
 import { z } from 'zod';
+import { ShippingOptionSchema } from '@/types/shipping';
 import type { ShippingOption } from '@/types/shipping';
 
 // ============================================
@@ -32,6 +35,45 @@ const costSchema = z.object({
     subtotal: z.number().min(0),
     couriers: z.array(z.enum(['jne', 'pos', 'jnt', 'sicepat'])).optional().default(['jne', 'jnt', 'pos']),
 });
+
+// ============================================
+// Cached RajaOngkir Fetch
+// ============================================
+
+const getCachedRajaOngkirCost = unstable_cache(
+    async (originCityId: string, destinationCityId: string, weight: number, courier: string) => {
+        return calculateRajaOngkirCost(originCityId, destinationCityId, weight, courier);
+    },
+    ['rajaongkir-cost'],
+    {
+        revalidate: 3600, // 1 hour cache
+        tags: ['shipping'],
+    }
+);
+
+// ============================================
+// Output Validation Helper
+// ============================================
+
+function validateShippingOptions(options: ShippingOption[]): ShippingOption[] {
+    return options.map((opt) => {
+        const result = ShippingOptionSchema.safeParse(opt);
+        if (result.success) {
+            return result.data;
+        }
+        // Log malformed data but don't crash - return sanitized version
+        // eslint-disable-next-line no-console
+        console.warn('Invalid shipping option:', result.error.errors);
+        return {
+            code: opt.code || 'UNKNOWN',
+            name: opt.name || 'Unknown',
+            service: opt.service || '-',
+            description: opt.description || '',
+            cost: typeof opt.cost === 'number' ? opt.cost : 0,
+            etd: opt.etd || '-',
+        };
+    });
+}
 
 // ============================================
 // POST Handler
@@ -78,7 +120,7 @@ export async function POST(request: NextRequest) {
         const originCityId = getOriginCityId();
         const shippingOptions: ShippingOption[] = [];
 
-        // 1. Calculate Custom Fleet Rates (if in Malang Area)
+        // 3. Calculate Custom Fleet Rates (if in Malang Area)
         if (isMalangArea(destinationCityId)) {
             const fleetRates = calculateCustomFleetRates(
                 destinationCityId,
@@ -88,14 +130,14 @@ export async function POST(request: NextRequest) {
             shippingOptions.push(...fleetRates);
         }
 
-        // 2. Fetch RajaOngkir Rates (Multiple Couriers)
+        // 4. Fetch RajaOngkir Rates (Multiple Couriers - CACHED)
         let rajaOngkirWarning: string | null = null;
         if (isEligibleForExpedition(weight)) {
             try {
-                // Fetch multiple couriers in parallel
+                // Fetch multiple couriers in parallel (with caching)
                 const courierResults = await Promise.allSettled(
                     couriers.map(async (courier) => {
-                        const results = await calculateRajaOngkirCost(
+                        const results = await getCachedRajaOngkirCost(
                             originCityId,
                             destinationCityId,
                             weight,
@@ -135,9 +177,8 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // 3. Fallback for Empty Options (Heavy Item + Outside Malang)
+        // 5. Fallback for Empty Options (Heavy Item + Outside Malang)
         if (shippingOptions.length === 0) {
-            // Return success but empty data, frontend explains why
             return NextResponse.json({
                 success: true,
                 data: [],
@@ -145,12 +186,13 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // 4. Sort by cheapest
-        shippingOptions.sort((a, b) => a.cost - b.cost);
+        // 6. Validate & Sort by cheapest
+        const validatedOptions = validateShippingOptions(shippingOptions);
+        validatedOptions.sort((a, b) => a.cost - b.cost);
 
         return NextResponse.json({
             success: true,
-            data: shippingOptions,
+            data: validatedOptions,
             warning: rajaOngkirWarning || undefined,
         });
     } catch (error) {
