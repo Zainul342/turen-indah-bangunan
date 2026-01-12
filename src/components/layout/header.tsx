@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { SearchBar } from "./search-bar";
 import { ShoppingCart, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
@@ -20,58 +19,73 @@ export function Header() {
 
     return (
         <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur-sm shadow-sm supports-[backdrop-filter]:bg-white/60">
-            <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6 md:gap-8">
+            <div className="container mx-auto flex h-20 items-center justify-between px-6 md:px-12">
 
-                {/* Logo Section */}
-                <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90">
+                {/* Logo Section - Brand Vibe update */}
+                <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
                     <Image
                         src="/images/93c2488a85.webp"
                         alt="Turen Indah Bangunan Logo"
-                        width={40}
-                        height={40}
-                        className="h-10 w-10 object-contain"
+                        width={36}
+                        height={36}
+                        className="h-9 w-9 object-contain"
                         priority
                     />
-                    <div className="flex flex-col leading-none">
-                        <span className="text-lg font-bold text-slate-900">Turen Indah</span>
-                        <span className="text-[10px] font-medium text-slate-500 tracking-wide uppercase">Bangunan</span>
+                    <div className="flex flex-col justify-center">
+                        <span className="font-display text-xl font-bold tracking-tight text-slate-950 leading-none">
+                            Turen Indah
+                        </span>
                     </div>
                 </Link>
 
-                {/* Desktop Search */}
-                <div className="hidden flex-1 md:block max-w-xl">
-                    <SearchBar />
-                </div>
+                {/* Desktop Navigation - Clean & Readable */}
+                <nav className="hidden md:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
+                    {[
+                        { name: "Beranda", href: "/" },
+                        { name: "Produk", href: "/products" },
+                        { name: "Cabang", href: "/stores" },
+                        { name: "Promo", href: "/promo" },
+                    ].map((link) => (
+                        <Link
+                            key={link.name}
+                            href={link.href}
+                            className="text-[15px] font-medium text-slate-600 hover:text-[#D32F2F] transition-all hover:-translate-y-0.5"
+                        >
+                            {link.name}
+                        </Link>
+                    ))}
+                </nav>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 md:gap-3">
-                    {/* Mobile Search Icon Trigger */}
-                    <Button variant="ghost" size="icon" className="md:hidden text-slate-600 hover:text-brand hover:bg-red-50">
-                        <Search className="h-5 w-5" />
-                    </Button>
-
-                    {/* Cart Button */}
-                    <Link href="/cart">
-                        <Button variant="ghost" size="icon" className="relative text-slate-600 hover:text-brand hover:bg-red-50 transition-colors">
-                            <ShoppingCart className="h-5 w-5" />
-                            {/* Badge */}
-                            {hasMounted && itemCount > 0 && (
-                                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-white ring-2 ring-white shadow-sm">
-                                    {itemCount > 99 ? "99" : itemCount}
-                                </span>
-                            )}
+                <div className="flex items-center gap-4">
+                    {/* Search & Cart */}
+                    <div className="flex items-center gap-1 pr-4 border-r border-slate-200">
+                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-[#D32F2F] hover:bg-transparent w-9 h-9">
+                            <Search className="h-[18px] w-[18px]" />
                         </Button>
-                    </Link>
 
-                    {/* Desktop Auth Buttons */}
-                    <div className="hidden items-center gap-2 md:flex pl-3 ml-1 border-l border-slate-200">
+                        <Link href="/cart">
+                            <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-[#D32F2F] hover:bg-transparent w-9 h-9">
+                                <ShoppingCart className="h-[18px] w-[18px]" />
+                                {/* Badge */}
+                                {hasMounted && itemCount > 0 && (
+                                    <span className="absolute top-0 right-0 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#D32F2F] text-[9px] font-bold text-white ring-2 ring-white">
+                                        {itemCount > 9 ? "9+" : itemCount}
+                                    </span>
+                                )}
+                            </Button>
+                        </Link>
+                    </div>
+
+                    {/* Auth Buttons */}
+                    <div className="hidden items-center gap-3 md:flex">
                         <Link href="/login">
-                            <Button variant="ghost" className="text-slate-600 hover:text-brand hover:bg-red-50">
+                            <Button variant="ghost" className="rounded-full text-[14px] font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 px-5 h-11">
                                 Masuk
                             </Button>
                         </Link>
                         <Link href="/register">
-                            <Button variant="brand" size="sm" className="shadow-md shadow-red-200/50">
+                            <Button className="bg-[#D32F2F] text-white hover:bg-[#B71C1C] text-[14px] font-semibold rounded-full px-7 h-11 shadow-lg shadow-red-500/20 transition-all hover:scale-105 active:scale-95">
                                 Daftar
                             </Button>
                         </Link>
