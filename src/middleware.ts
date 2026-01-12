@@ -4,6 +4,11 @@
  * Edge-level route protection.
  * Runs on every request before page renders.
  * 
+ * ⚠️ SECURITY WARNING: This middleware is OPTIMISTIC UX ONLY.
+ * - Cookies (tib-session, tib-role) can be spoofed client-side
+ * - NEVER trust middleware for actual security decisions
+ * - Real verification happens in Server Components / API routes via verifySessionCookie()
+ * 
  * NOTE: Firebase Admin SDK cannot run in Middleware (Edge Runtime).
  * We only check for cookie existence here. 
  * Full verification happens in Layout/Page/API via verifySessionCookie.
@@ -24,6 +29,13 @@ const adminRoutes = ['/admin'];
 const guestOnlyRoutes = ['/login', '/register', '/forgot-password'];
 
 // ============================================
+// Type Definitions
+// ============================================
+
+const ADMIN_ROLES = ['admin', 'superadmin'] as const;
+type AdminRole = typeof ADMIN_ROLES[number];
+
+// ============================================
 // Helper Functions
 // ============================================
 
@@ -39,6 +51,10 @@ function isGuestOnlyRoute(pathname: string): boolean {
     return guestOnlyRoutes.some((route) => pathname.startsWith(route));
 }
 
+function isAdminRole(role: string | undefined): role is AdminRole {
+    return role !== undefined && ADMIN_ROLES.includes(role as AdminRole);
+}
+
 // ============================================
 // Middleware Function
 // ============================================
@@ -51,7 +67,7 @@ export async function middleware(request: NextRequest) {
     const userRole = request.cookies.get('tib-role')?.value;
 
     const isAuthenticated = !!sessionCookie;
-    const isAdmin = userRole === 'admin';
+    const isAdmin = isAdminRole(userRole);
 
     // ============================================
     // Route Protection Logic
@@ -76,12 +92,13 @@ export async function middleware(request: NextRequest) {
             loginUrl.searchParams.set('redirect', pathname);
             return NextResponse.redirect(loginUrl);
         }
-        // Note: Role check depends on 'tib-role' cookie which can be spoofed on client.
-        // However, the actual DATA fetching in /admin pages receives 403 from API 
-        // because API verifies the actual Session Cookie claims.
-        // This middleware check is just for UX/Redirection.
+        // ⚠️ Role check based on 'tib-role' cookie (can be spoofed!)
+        // Real security happens in /admin/layout.tsx via verifySessionCookie()
+        // This is just UX optimization to avoid showing admin UI then redirecting
         if (!isAdmin) {
-            return NextResponse.redirect(new URL('/', request.url));
+            const homeUrl = new URL('/', request.url);
+            homeUrl.searchParams.set('error', 'admin_only');
+            return NextResponse.redirect(homeUrl);
         }
     }
 

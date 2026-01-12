@@ -18,32 +18,32 @@ export function HeroSection() {
                                 <CheckCircle2 className="h-3.5 w-3.5" />
                             </span>
                             <span className="text-sm font-medium text-slate-700">
-                                Pusat Bahan Bangunan Terlengkap
+                                Garansi Sampai Tepat Waktu
                             </span>
                         </div>
 
                         {/* Headline */}
                         <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-slate-900 leading-[1.1] mb-6">
-                            BANGUN <br />
-                            <span className="text-[#D32F2F]">Tanpa Ragu.</span>
+                            Proyek Lancar, <br />
+                            <span className="text-[#D32F2F]">Tanpa Menunggu.</span>
                         </h1>
 
                         {/* Subheadline */}
                         <p className="text-lg text-slate-500 leading-relaxed mb-8 max-w-[540px]">
-                            Mitra terpercaya lebih dari 50.000+ kontraktor dan pemilik rumah sejak 2005. Stok pasti ready, 100% original, dan kirim hari ini.
+                            Stok terjamin dari 100+ merek terpercaya. Pesan online sebelum jam 2 siang, kami antar ke proyek Anda hari ini. Terbukti diandalkan oleh 50.000+ profesional.
                         </p>
 
                         {/* Buttons */}
                         <div className="flex flex-wrap gap-4 w-full sm:w-auto">
                             <Link href="/products" className="w-full sm:w-auto">
                                 <Button className="w-full sm:w-auto h-12 px-8 rounded-lg bg-[#D32F2F] text-white hover:bg-[#B71C1C] font-semibold text-base shadow-xl shadow-red-500/10 transition-all hover:scale-[1.02] active:scale-[0.98]">
-                                    Mulai Belanja
+                                    Cek Ketersediaan Stok
                                 </Button>
                             </Link>
                             <Link href="/stores" className="w-full sm:w-auto">
                                 <Button variant="outline" className="w-full sm:w-auto h-12 px-6 rounded-lg border-slate-200 text-slate-700 hover:bg-slate-50 font-medium text-base flex items-center justify-center gap-2 hover:border-slate-300 transition-all">
                                     <PlayCircle className="h-5 w-5 text-[#D32F2F]" />
-                                    Cari Cabang
+                                    Atur Pengiriman Cepat
                                 </Button>
                             </Link>
                         </div>
@@ -69,7 +69,7 @@ export function HeroSection() {
                                         </svg>
                                     ))}
                                 </div>
-                                <p className="text-sm font-medium text-slate-600 mt-1">Trustpilot Review <span className="text-slate-400 font-normal">(4.8/5)</span></p>
+                                <p className="text-sm font-medium text-slate-600 mt-1">Kontraktor Puas <span className="text-slate-400 font-normal">(4.8/5)</span></p>
                             </div>
                         </div>
                     </div>

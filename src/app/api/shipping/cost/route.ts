@@ -2,13 +2,16 @@
  * Shipping Cost API
  * ==================
  * POST /api/shipping/cost - Calculate shipping cost (Hybrid)
- * Hardened version with strict typing and error handling.
+ * Hardened version with strict typing, error handling, and auth.
+ *
+ * Security: Requires valid session cookie to prevent abuse/spam.
  *
  * @file src/app/api/shipping/cost/route.ts
  * @project Turen Indah Bangunan
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { calculateRajaOngkirCost } from '@/lib/rajaongkir';
 import {
     calculateCustomFleetRates,
@@ -27,6 +30,7 @@ const costSchema = z.object({
     destinationCityId: z.string().min(1),
     weight: z.number().min(1), // in grams
     subtotal: z.number().min(0),
+    couriers: z.array(z.enum(['jne', 'pos', 'jnt', 'sicepat'])).optional().default(['jne', 'jnt', 'pos']),
 });
 
 // ============================================
@@ -35,6 +39,24 @@ const costSchema = z.object({
 
 export async function POST(request: NextRequest) {
     try {
+        // 1. Session Verification (prevent abuse/spam)
+        const cookieStore = await cookies();
+        const sessionCookie = cookieStore.get('tib-session')?.value;
+
+        if (!sessionCookie) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: {
+                        code: 'UNAUTHORIZED',
+                        message: 'Session required',
+                    },
+                },
+                { status: 401 }
+            );
+        }
+
+        // 2. Validate Request
         const body = await request.json();
         const parseResult = costSchema.safeParse(body);
 
@@ -52,7 +74,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { destinationCityId, weight, subtotal } = parseResult.data;
+        const { destinationCityId, weight, subtotal, couriers } = parseResult.data;
         const originCityId = getOriginCityId();
         const shippingOptions: ShippingOption[] = [];
 
@@ -66,33 +88,50 @@ export async function POST(request: NextRequest) {
             shippingOptions.push(...fleetRates);
         }
 
-        // 2. Fetch RajaOngkir Rates (Hybrid strategy)
+        // 2. Fetch RajaOngkir Rates (Multiple Couriers)
+        let rajaOngkirWarning: string | null = null;
         if (isEligibleForExpedition(weight)) {
             try {
-                const courier = 'jne'; // Can be made dynamic from env or request
-                const rajaOngkirResults = await calculateRajaOngkirCost(
-                    originCityId,
-                    destinationCityId,
-                    weight,
-                    courier
+                // Fetch multiple couriers in parallel
+                const courierResults = await Promise.allSettled(
+                    couriers.map(async (courier) => {
+                        const results = await calculateRajaOngkirCost(
+                            originCityId,
+                            destinationCityId,
+                            weight,
+                            courier
+                        );
+                        return { courier, results };
+                    })
                 );
 
-                if (rajaOngkirResults.length > 0 && rajaOngkirResults[0]) {
-                    const result = rajaOngkirResults[0];
-                    const jneCosts: ShippingOption[] = result.costs.map((cost) => ({
-                        code: result.code.toUpperCase(), // 'JNE'
-                        name: result.name,
-                        service: cost.service,
-                        description: cost.description,
-                        cost: cost.cost[0]?.value || 0,
-                        etd: cost.cost[0]?.etd ? `${cost.cost[0].etd} Hari` : '-',
-                    }));
-                    shippingOptions.push(...jneCosts);
+                // Process successful results
+                courierResults.forEach((result) => {
+                    if (result.status === 'fulfilled' && result.value.results.length > 0) {
+                        const courierData = result.value.results[0];
+                        if (courierData) {
+                            const options: ShippingOption[] = courierData.costs.map((cost) => ({
+                                code: courierData.code.toUpperCase(),
+                                name: courierData.name,
+                                service: cost.service,
+                                description: cost.description,
+                                cost: cost.cost[0]?.value || 0,
+                                etd: cost.cost[0]?.etd ? `${cost.cost[0].etd} Hari` : '-',
+                            }));
+                            shippingOptions.push(...options);
+                        }
+                    }
+                });
+
+                // Check if all failed
+                const allFailed = courierResults.every((result) => result.status === 'rejected');
+                if (allFailed) {
+                    rajaOngkirWarning = 'Layanan ekspedisi sedang gangguan. Hanya opsi lokal tersedia.';
                 }
             } catch (roError) {
                 // eslint-disable-next-line no-console
                 console.warn('RajaOngkir fetch failed:', roError);
-                // Don't fail the whole request, just return what we have (e.g. maybe just fleet)
+                rajaOngkirWarning = 'Layanan ekspedisi sedang gangguan. Hanya opsi lokal tersedia.';
             }
         }
 
@@ -102,7 +141,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({
                 success: true,
                 data: [],
-                message: 'No shipping options available (Item potentially too heavy for expedition)'
+                warning: 'Tidak ada opsi pengiriman untuk lokasi/berat ini',
             });
         }
 
@@ -112,6 +151,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             success: true,
             data: shippingOptions,
+            warning: rajaOngkirWarning || undefined,
         });
     } catch (error) {
         // eslint-disable-next-line no-console

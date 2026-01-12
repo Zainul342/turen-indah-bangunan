@@ -71,11 +71,12 @@ export async function POST(request: NextRequest) {
         const cookieStore = await cookies();
         cookieStore.set(COOKIE_NAME, sessionCookie, COOKIE_OPTIONS);
 
-        // Role cookie (Not HTTPOnly, for client-side UI logic)
-        // Note: Do NOT trust this for security checks on server
+        // Role cookie (httpOnly for security - prevents JS access/XSS)
+        // Note: Server-side verification is still required - never trust cookies alone
         cookieStore.set('tib-role', role, {
             ...COOKIE_OPTIONS,
-            httpOnly: false,
+            httpOnly: true, // Changed to true for security
+            sameSite: 'strict', // Stricter CSRF protection
         });
 
         return NextResponse.json({ success: true, role });

@@ -177,8 +177,8 @@ function ProductsContent() {
                                     className="py-4"
                                 />
                                 <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
-                                    <span>Rp {priceRange[0].toLocaleString("id-ID")}</span>
-                                    <span>Rp {priceRange[1].toLocaleString("id-ID")}+</span>
+                                    <span>Rp {priceRange[0]!.toLocaleString("id-ID")}</span>
+                                    <span>Rp {priceRange[1]!.toLocaleString("id-ID")}+</span>
                                 </div>
                             </div>
                         </div>

@@ -51,14 +51,14 @@ export function NewsletterCTA() {
                             <form className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row" onSubmit={handleSubmit}>
                                 <Input
                                     type="email"
-                                    placeholder="Masukkan email Anda"
+                                    placeholder="Email Anda (Biar hemat)"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
                                     className="h-12 border-0 bg-white/90 text-slate-900 placeholder:text-slate-500 focus-visible:ring-0 focus-visible:ring-offset-0"
                                 />
-                                <Button type="submit" size="lg" className="h-12 bg-slate-900 text-white hover:bg-slate-800 font-bold">
-                                    Langganan
+                                <Button type="submit" size="lg" className="h-12 bg-slate-900 text-white hover:bg-slate-800 font-bold shadow-lg">
+                                    Dapatkan Info Promo
                                 </Button>
                             </form>
                         </>

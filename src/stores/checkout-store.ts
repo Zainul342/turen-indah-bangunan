@@ -2,13 +2,14 @@
  * Checkout Store (Zustand)
  * =========================
  * Global state management for checkout flow.
+ * Refactored for security, stability, and debugging.
  *
  * @file src/stores/checkout-store.ts
  * @project Turen Indah Bangunan
  */
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 import type {
     CheckoutStep,
     ShippingAddress,
@@ -31,6 +32,7 @@ interface CheckoutState {
     subtotal: number;
     totalWeight: number;
     isCartValidated: boolean;
+    lastValidatedAt: number | null; // Timestamp for freshness
 
     // Shipping
     shippingAddress: ShippingAddress | null;
@@ -67,6 +69,7 @@ interface CheckoutState {
     // Computed (helper methods)
     getTotal: () => number;
     canProceedToPayment: () => boolean;
+    isStepValid: (step: number) => boolean;
 }
 
 // ============================================
@@ -80,6 +83,7 @@ const initialState = {
     subtotal: 0,
     totalWeight: 0,
     isCartValidated: false,
+    lastValidatedAt: null,
     shippingAddress: null,
     shippingOptions: [] as ShippingOption[],
     selectedShipping: null,
@@ -97,99 +101,171 @@ const initialState = {
 // ============================================
 
 export const useCheckoutStore = create<CheckoutState>()(
-    persist(
-        (set, get) => ({
-            ...initialState,
+    devtools(
+        persist(
+            (set, get) => ({
+                ...initialState,
 
-            // Step Navigation
-            setStep: (step) => {
-                const { completedSteps } = get();
-                // Only allow going back or to next uncompleted step
-                if (step <= get().currentStep || completedSteps.includes((step - 1) as CheckoutStep)) {
-                    set({ currentStep: step });
+                // Step Navigation
+                setStep: (step) => {
+                    const { currentStep, completedSteps } = get();
+
+                    // Prevent jumping forward to locked steps
+                    // Allow: 
+                    // 1. Staying on same step
+                    // 2. Going back (step < current)
+                    // 3. Going forward only if previous step completed
+                    if (step > currentStep) {
+                        const previousStep = (step - 1) as CheckoutStep;
+                        if (!completedSteps.includes(previousStep)) {
+                            return; // Block forward jump
+                        }
+                        set({ currentStep: step });
+                        return;
+                    }
+
+                    // Going backward or staying same
+                    if (step === currentStep) return;
+
+                    // Handling backward navigation: Clear downstream state
+                    set((state) => {
+                        let nextState = { ...state, currentStep: step };
+
+                        // If going back before Payment (Step 2), clear payment/order data
+                        if (step < 2) {
+                            nextState = {
+                                ...nextState,
+                                orderId: null,
+                                orderNumber: null,
+                                paymentToken: null,
+                                paymentStatus: 'idle',
+                                // We keep shipping selection/address as user needs to see it to change it
+                            };
+                        }
+
+                        return nextState;
+                    });
+                },
+
+                completeStep: (step) => {
+                    const { completedSteps } = get();
+                    if (!completedSteps.includes(step)) {
+                        set({ completedSteps: [...completedSteps, step] });
+                    }
+                },
+
+                // Cart Validation
+                setValidatedCart: (items, subtotal, weight) => {
+                    set({
+                        validatedItems: items,
+                        subtotal,
+                        totalWeight: weight,
+                        isCartValidated: true,
+                        lastValidatedAt: Date.now(),
+                    });
+                },
+
+                // Shipping
+                setShippingAddress: (address) => {
+                    // Reset shipping options if address changes prevents invalid shipping cost
+                    set({
+                        shippingAddress: address,
+                        shippingOptions: [],
+                        selectedShipping: null
+                    });
+                },
+
+                setShippingOptions: (options) => {
+                    set({ shippingOptions: options });
+                },
+
+                selectShipping: (option) => {
+                    set({ selectedShipping: option });
+                },
+
+                setLoadingShipping: (loading) => {
+                    set({ isLoadingShipping: loading });
+                },
+
+                // Order
+                setCustomerNotes: (notes) => {
+                    set({ customerNotes: notes });
+                },
+
+                setOrderDetails: (orderId, orderNumber, paymentToken) => {
+                    set({ orderId, orderNumber, paymentToken });
+                },
+
+                setPaymentStatus: (status) => {
+                    set({ paymentStatus: status });
+                },
+
+                setCreatingOrder: (loading) => {
+                    set({ isCreatingOrder: loading });
+                },
+
+                // Reset
+                reset: () => {
+                    // Clear storage explicitly
+                    try {
+                        localStorage.removeItem('tib-checkout-storage');
+                    } catch (e) {
+                        // eslint-disable-next-line no-console
+                        console.warn('Failed to clear checkout storage', e);
+                    }
+                    set(initialState);
+                },
+
+                // Computed Helpers
+                getTotal: () => {
+                    const { subtotal, selectedShipping } = get();
+                    const shippingCost = selectedShipping?.cost || 0;
+                    return subtotal + shippingCost;
+                },
+
+                canProceedToPayment: () => {
+                    const { shippingAddress, selectedShipping, isCartValidated } = get();
+                    return isCartValidated && shippingAddress !== null && selectedShipping !== null;
+                },
+
+                isStepValid: (step) => {
+                    const s = get();
+                    // Step 1: Address & Shipping
+                    if (step === 1) {
+                        return s.isCartValidated && !!s.shippingAddress && !!s.selectedShipping;
+                    }
+                    // Step 2: Payment Review (ready to pay)
+                    if (step === 2) {
+                        return s.isCartValidated && !!s.shippingAddress && !!s.selectedShipping;
+                    }
+                    return false;
                 }
-            },
-
-            completeStep: (step) => {
-                const { completedSteps } = get();
-                if (!completedSteps.includes(step)) {
-                    set({ completedSteps: [...completedSteps, step] });
-                }
-            },
-
-            // Cart Validation
-            setValidatedCart: (items, subtotal, weight) => {
-                set({
-                    validatedItems: items,
-                    subtotal,
-                    totalWeight: weight,
-                    isCartValidated: true,
-                });
-            },
-
-            // Shipping
-            setShippingAddress: (address) => {
-                set({ shippingAddress: address });
-            },
-
-            setShippingOptions: (options) => {
-                set({ shippingOptions: options });
-            },
-
-            selectShipping: (option) => {
-                set({ selectedShipping: option });
-            },
-
-            setLoadingShipping: (loading) => {
-                set({ isLoadingShipping: loading });
-            },
-
-            // Order
-            setCustomerNotes: (notes) => {
-                set({ customerNotes: notes });
-            },
-
-            setOrderDetails: (orderId, orderNumber, paymentToken) => {
-                set({ orderId, orderNumber, paymentToken });
-            },
-
-            setPaymentStatus: (status) => {
-                set({ paymentStatus: status });
-            },
-
-            setCreatingOrder: (loading) => {
-                set({ isCreatingOrder: loading });
-            },
-
-            // Reset
-            reset: () => {
-                set(initialState);
-            },
-
-            // Computed Helpers
-            getTotal: () => {
-                const { subtotal, selectedShipping } = get();
-                const shippingCost = selectedShipping?.cost || 0;
-                return subtotal + shippingCost;
-            },
-
-            canProceedToPayment: () => {
-                const { shippingAddress, selectedShipping, isCartValidated } = get();
-                return isCartValidated && shippingAddress !== null && selectedShipping !== null;
-            },
-        }),
-        {
-            name: 'tib-checkout-storage',
-            storage: createJSONStorage(() => sessionStorage),
-            partialize: (state) => ({
-                // Only persist essential data
-                currentStep: state.currentStep,
-                completedSteps: state.completedSteps,
-                shippingAddress: state.shippingAddress,
-                selectedShipping: state.selectedShipping,
-                customerNotes: state.customerNotes,
             }),
-        }
+            {
+                name: 'tib-checkout-storage',
+                storage: createJSONStorage(() => localStorage),
+                version: 2,
+                migrate: (persistedState: unknown, version) => {
+                    if (version === 0 || version === 1) {
+                        return { ...initialState }; // Reset if old version to be safe
+                    }
+                    return persistedState as CheckoutState;
+                },
+                partialize: (state) => ({
+                    currentStep: state.currentStep,
+                    completedSteps: state.completedSteps,
+                    shippingAddress: state.shippingAddress,
+                    selectedShipping: state.selectedShipping,
+                    customerNotes: state.customerNotes,
+                    validatedItems: state.validatedItems,
+                    subtotal: state.subtotal,
+                    totalWeight: state.totalWeight,
+                    isCartValidated: state.isCartValidated,
+                    lastValidatedAt: state.lastValidatedAt,
+                }),
+            }
+        ),
+        { name: 'CheckoutStore' }
     )
 );
 

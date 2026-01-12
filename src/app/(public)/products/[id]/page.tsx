@@ -1,88 +1,102 @@
-import { ProductGallery } from "@/components/product/product-gallery";
-import { ProductInfo } from "@/components/product/product-info";
-import { RelatedProducts } from "@/components/product/related-products";
-import { ChevronRight, Home } from "lucide-react";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
+import { ProductGallery } from '@/components/product/product-gallery';
+import { ProductInfo } from '@/components/product/product-info';
+import { RelatedProducts } from '@/components/product/related-products';
+import { ChevronRight, Home } from 'lucide-react';
+import Link from 'next/link';
+import { getProduct } from '@/lib/products';
+import type { Metadata } from 'next';
 
-// Dummy Data Lookup
-interface ProductData {
-    id: string;
-    name: string;
-    price: number;
-    unit: string;
-    category: string;
-    description: string;
-    stock: number;
-    specs: { label: string; value: string }[];
-    images: string[];
-}
+// ============================================
+// Types
+// ============================================
 
-const PRODUCTS_DB: Record<string, ProductData> = {
-    "1": {
-        id: "1",
-        name: "Semen Gresik 40kg PCC High Quality",
-        price: 65000,
-        unit: "sak",
-        category: "Semen",
-        description: "Semen Gresik PCC (Portland Composite Cement) adalah bahan pengikat hidrolis hasil penggilingan bersama-sama terak (clinker) semen portland dan gipsum dengan satu atau lebih bahan anorganik, atau hasil pencampuran antara bubuk semen portland dengan bubuk bahan anorganik lain. Cocok untuk bangunan umum, jembatan, jalan raya, bangunan irigasi, dan bahan bangunan beton.",
-        stock: 100,
-        specs: [
-            { label: "Berat", value: "40 kg" },
-            { label: "Tipe", value: "PCC" },
-            { label: "Warna", value: "Abu-abu" },
-            { label: "Kemasan", value: "Zak Kertas 3 Lapis" }
-        ],
-        images: ["/products/semen.jpg", "/products/semen-2.jpg"] // Placeholders
-    },
-    "2": {
-        id: "2",
-        name: "Bata Ringan Citicon / Kubik",
-        price: 525000,
-        unit: "m3",
-        category: "Bata Ringan",
-        description: "Bata ringan Citicon adalah beton ringan aerasi yang diproduksi dengan teknologi tinggi. Memiliki berat jenis yang ringan namun kuat tekan yang tinggi. Tahan api, kedap suara, dan presisi tinggi sehingga pemasangan lebih cepat dan rapi. Cocok untuk dinding bangunan bertingkat.",
-        stock: 50,
-        specs: [
-            { label: "Dimensi", value: "60 x 20 x 10 cm" },
-            { label: "Berat Kering", value: "520 kg/m3" },
-            { label: "Kuat Tekan", value: "4.0 N/mm2" },
-            { label: "Isi per m3", value: "83 pcs (tebal 10cm)" }
-        ],
-        images: []
-    }
-};
-
-// Next.js 15: params is a Promise
 interface Props {
     params: Promise<{ id: string }>;
 }
 
-export default async function ProductDetailPage({ params }: Props) {
-    const resolvedParams = await params;
-    const product = PRODUCTS_DB[resolvedParams.id] || PRODUCTS_DB["1"]; // Fallback to id 1 for simulation
+// ============================================
+// Metadata (SEO & Open Graph)
+// ============================================
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { id } = await params;
+    const product = await getProduct(id);
+
+    if (!product) {
+        return { title: 'Produk Tidak Ditemukan — Turen Indah Bangunan' };
+    }
+
+    return {
+        title: `${product.name} — Turen Indah Bangunan`,
+        description: product.description.slice(0, 160) + '...',
+        openGraph: {
+            title: product.name,
+            description: product.description.slice(0, 160),
+            images: product.images[0] ? [{ url: product.images[0] }] : undefined,
+        },
+    };
+}
+
+// ============================================
+// Related Products Loading Skeleton
+// ============================================
+
+function RelatedSkeleton() {
+    return (
+        <section className="mt-16 border-t border-slate-100 pt-16">
+            <div className="h-8 w-48 bg-slate-200 rounded animate-pulse mb-8" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="aspect-square bg-slate-100 rounded-xl animate-pulse" />
+                ))}
+            </div>
+        </section>
+    );
+}
+
+// ============================================
+// Page Component
+// ============================================
+
+export default async function ProductDetailPage({ params }: Props) {
+    const { id } = await params;
+    const product = await getProduct(id);
+
+    // Product not found → 404
     if (!product) {
         notFound();
     }
 
-    // Override ID if fallback used
-    if (!PRODUCTS_DB[resolvedParams.id]) {
-        product.name = `[Demo] ${product.name}`;
-    }
-
     return (
-        <div className="bg-white min-h-screen pb-20">
+        <main className="bg-white min-h-screen pb-20">
             {/* Breadcrumbs */}
-            <div className="container mx-auto px-4 md:px-6 py-4">
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <Link href="/" className="hover:text-primary"><Home className="h-4 w-4" /></Link>
-                    <ChevronRight className="h-4 w-4" />
-                    <Link href="/products" className="hover:text-primary">Katalog</Link>
-                    <ChevronRight className="h-4 w-4" />
-                    <span className="font-semibold text-slate-900 truncate max-w-[200px]">{product.name}</span>
-                </div>
-            </div>
+            <nav className="container mx-auto px-4 md:px-6 py-4" aria-label="Breadcrumb">
+                <ol className="flex items-center gap-2 text-sm text-slate-500">
+                    <li>
+                        <Link href="/" className="hover:text-primary" aria-label="Beranda">
+                            <Home className="h-4 w-4" />
+                        </Link>
+                    </li>
+                    <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                    <li>
+                        <Link href="/products" className="hover:text-primary">
+                            Katalog
+                        </Link>
+                    </li>
+                    <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                    <li>
+                        <span
+                            className="font-semibold text-slate-900 truncate max-w-[200px] inline-block"
+                            aria-current="page"
+                            title={product.name}
+                        >
+                            {product.name}
+                        </span>
+                    </li>
+                </ol>
+            </nav>
 
             <div className="container mx-auto px-4 md:px-6 mt-4">
                 <div className="grid lg:grid-cols-2 gap-10 xl:gap-16">
@@ -93,9 +107,11 @@ export default async function ProductDetailPage({ params }: Props) {
                     <ProductInfo product={product} />
                 </div>
 
-                {/* Related Strategy */}
-                <RelatedProducts />
+                {/* Related Products - Wrapped in Suspense for streaming */}
+                <Suspense fallback={<RelatedSkeleton />}>
+                    <RelatedProducts currentId={product.id} category={product.category} />
+                </Suspense>
             </div>
-        </div>
+        </main>
     );
 }

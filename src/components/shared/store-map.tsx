@@ -1,6 +1,6 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -27,6 +27,7 @@ const RedIcon = L.icon({
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
+    tooltipAnchor: [16, -16],
 });
 
 interface Store {
@@ -57,6 +58,11 @@ export function StoreMap({ stores, center = [-8.05, 112.6], zoom = 10 }: StoreMa
             />
             {stores.map((store, index) => (
                 <Marker key={index} position={[store.lat, store.lng]} icon={RedIcon}>
+                    {/* Permanent Label */}
+                    <Tooltip permanent direction="top" offset={[0, -32]} className="!bg-white !border-slate-200 !shadow-lg !rounded-lg !px-2 !py-1 !text-xs !font-bold !text-slate-800 !whitespace-nowrap">
+                        {store.name.replace("TIB ", "")}
+                    </Tooltip>
+                    {/* Popup on Click */}
                     <Popup>
                         <div className="p-1">
                             <h3 className="font-bold text-slate-900 text-sm">{store.name}</h3>
@@ -68,3 +74,4 @@ export function StoreMap({ stores, center = [-8.05, 112.6], zoom = 10 }: StoreMa
         </MapContainer>
     );
 }
+

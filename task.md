@@ -211,6 +211,11 @@
 - [x] Shipping estimation (RajaOngkir + Custom Armada)
 - [x] **Hardening:** Secure Auth Session (Firebase Session Cookie)
 - [x] **Hardening:** Strict Shipping Types & Safety
+- [x] **Security Hardening (Phase 2):**
+  - [x] Admin layout server-side verification (`verifySessionCookie`)
+  - [x] Middleware improvements (typed roles, UX feedback)
+  - [x] Shipping API auth + multi-courier + error surfacing
+  - [x] Cookie security (`httpOnly: true`, `sameSite: strict`)
 
 #### 4.4 Frontend Development
 
@@ -252,6 +257,7 @@
   - [x] Success Page with Suspense boundary
   - [x] API Routes (validate, shipping, create-order)
   - [x] Dependencies (use-cart, shipping-rules, window.snap types)
+  - [x] **Store Hardening** (localStorage, Security Fixes, DevTools)
 - [x] **Order History**
   - [x] Order types extended with STATUS_CONFIG and TAB_FILTERS
   - [x] UI Components (status-badge, tabs, card, timeline, empty)

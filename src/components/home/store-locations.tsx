@@ -1,13 +1,22 @@
+"use client";
+
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { MapPin, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+// Dynamically import to avoid SSR issues with Leaflet
+const StoreMap = dynamic(
+    () => import("@/components/shared/store-map").then((mod) => mod.StoreMap),
+    { ssr: false, loading: () => <div className="h-full w-full bg-slate-100 animate-pulse rounded-2xl" /> }
+);
+
 const STORES = [
-    { name: "TIB Talangsuko Turen (Pusat)", address: "Jl. Raya Talang Suko No.15 b, Padi, Talangsuko", mapUrl: "https://maps.google.com/?q=TIB+Talangsuko+Turen+Malang" },
-    { name: "TIB Bululawang", address: "Bululawang, Kec. Bululawang, Kabupaten Malang", mapUrl: "https://maps.google.com/?q=Bululawang+Malang" },
-    { name: "TIB Sawojajar", address: "Jl. Danau Kerinci Raya No.67, Lesanpuro", mapUrl: "https://maps.google.com/?q=Sawojajar+Malang" },
-    { name: "TIB Kepanjen", address: "Jl. KH. Ahmad Dahlan, Kepanjen", mapUrl: "https://maps.google.com/?q=Kepanjen+Malang" },
-    { name: "TIB Batu", address: "Mojorejo, Kec. Junrejo, Kota Batu", mapUrl: "https://maps.google.com/?q=Junrejo+Batu+Malang" },
+    { name: "TIB Talangsuko Turen (Pusat)", address: "Jl. Raya Talang Suko No.15 b, Padi, Talangsuko", lat: -8.1347, lng: 112.6986 },
+    { name: "TIB Bululawang", address: "Bululawang, Kec. Bululawang, Kabupaten Malang", lat: -8.0456, lng: 112.6658 },
+    { name: "TIB Sawojajar", address: "Jl. Danau Kerinci Raya No.67, Lesanpuro", lat: -7.9685, lng: 112.6648 },
+    { name: "TIB Kepanjen", address: "Jl. KH. Ahmad Dahlan, Kepanjen", lat: -8.1342, lng: 112.5646 },
+    { name: "TIB Batu", address: "Mojorejo, Kec. Junrejo, Kota Batu", lat: -7.8847, lng: 112.5288 },
 ];
 
 export function StoreLocations() {
@@ -29,11 +38,8 @@ export function StoreLocations() {
 
                         <div className="space-y-4">
                             {STORES.map((store, i) => (
-                                <a
+                                <div
                                     key={i}
-                                    href={store.mapUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
                                     className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 hover:border-blue-100 hover:bg-blue-50/50 transition-colors group cursor-pointer"
                                 >
                                     <div className="mt-1 h-9 w-9 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-600 transition-all">
@@ -44,7 +50,7 @@ export function StoreLocations() {
                                         <p className="text-sm text-slate-500">{store.address}</p>
                                     </div>
                                     <ArrowUpRight className="h-4 w-4 text-slate-300 group-hover:text-blue-500" />
-                                </a>
+                                </div>
                             ))}
                         </div>
 
@@ -57,18 +63,9 @@ export function StoreLocations() {
                         </div>
                     </div>
 
-                    {/* Real Google Maps Embed */}
+                    {/* OpenStreetMap with Markers */}
                     <div className="relative h-[400px] lg:h-[600px] rounded-3xl overflow-hidden bg-slate-100 shadow-xl border border-slate-200">
-                        <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126148.36938368!2d112.58!3d-8.1!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd627f3c6e8e6f5%3A0x4027a76e3524380!2sMalang%2C%20Malang%20City%2C%20East%20Java!5e0!3m2!1sen!2sid!4v1704700000000!5m2!1sen!2sid"
-                            width="100%"
-                            height="100%"
-                            style={{ border: 0 }}
-                            allowFullScreen
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                            title="Peta Lokasi Turen Indah Bangunan"
-                        />
+                        <StoreMap stores={STORES} />
                     </div>
                 </div>
             </div>

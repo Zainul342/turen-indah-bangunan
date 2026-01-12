@@ -53,6 +53,12 @@ export function ProductCard({
         <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-red-100">
             {/* Badge Section */}
             <div className="absolute left-2 top-2 z-10 flex flex-col gap-1.5">
+                {/* Scarcity Badge */}
+                {!isOutOfStock && stock <= 5 && (
+                    <span className="inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-bold text-orange-700">
+                        Sisa {stock}
+                    </span>
+                )}
                 {isNew && (
                     <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-700">
                         Baru
